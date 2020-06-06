@@ -1,5 +1,7 @@
 package Model;
 
+import Exception.*;
+
 public class Location_Model {
     private double latitude;
     private double longitude;

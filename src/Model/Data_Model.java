@@ -4,6 +4,8 @@ import javafx.util.Pair;
 
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
+// TODO : ouvrir le fichier csv, tester les méthodes
+
 
 public class Data_Model {
     private ArrayList<DataByYear_Model> period;
@@ -11,7 +13,11 @@ public class Data_Model {
     private double min;
     private double max;
 
-    // TODO : constructor
+    public Data_Model(){
+        period = new ArrayList<>();
+        knowZone = new ArrayList<>();
+    }
+
     // TODO : add
 
     public double getMin(){

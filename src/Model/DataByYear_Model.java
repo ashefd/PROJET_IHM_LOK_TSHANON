@@ -16,6 +16,10 @@ public class DataByYear_Model {
         anomalyByLocation = new HashMap<>();
     }
 
+    public String getYear(){
+        return year;
+    }
+
     // method to add
     public boolean addData(Location_Model location, double anomalyValue){
         if(anomalyByLocation.containsKey(location)){
@@ -32,10 +36,6 @@ public class DataByYear_Model {
         }else{
             return null;
         }
-    }
-
-    public String getYear(){
-        return year;
     }
 
     // TODO : method getEveryAnomaly
