@@ -1,5 +1,8 @@
 package Model;
 
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Double;
 
@@ -35,5 +38,12 @@ public class DataByYear_Model {
     }
 
     // TODO : method getEveryAnomaly
+    public ArrayList<Pair<Location_Model, Double>> getEveryAnomaly(){
+        ArrayList<Pair<Location_Model, Double>> result = new ArrayList<>();
+        for(Location_Model i : anomalyByLocation.keySet()){
+            result.add(new Pair<>(i, anomalyByLocation.get(i)));
+        }
+        return result;
+    }
 
 }

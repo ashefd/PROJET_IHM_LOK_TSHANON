@@ -9,6 +9,7 @@ public class Data_Model {
     private double max;
 
     // TODO : constructor
+    // TODO : add
 
     public double getMin(){
         return min;
@@ -18,10 +19,16 @@ public class Data_Model {
         return max;
     }
 
-    /*
     public java.lang.Double getValue(double latitude, double longitude, String year){
-
+        Location_Model inter = new Location_Model(latitude, longitude);
+        for(DataByYear_Model i : period){
+            if(i.getYear().equals(year)){
+                return i.getValue(inter);
+            }
+        }
+        return null;
     }
-     */
+
+
 
 }

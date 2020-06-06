@@ -25,4 +25,18 @@ public class Location_Model {
     }
 
     // TODO override equals()
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Location_Model){
+            if(this.latitude != ((Location_Model) obj).latitude){
+                return false;
+            }else if(this.longitude != ((Location_Model) obj).longitude){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
+    }
 }
