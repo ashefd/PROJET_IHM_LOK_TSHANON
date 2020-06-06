@@ -19,9 +19,7 @@ public class Location_Model {
 
     @Override
     public String toString() {
-        String a = "Latitude = ";
-        a += getLatitude() + "\nLongitude = " + getLongitude() + "\n";
-        return a;
+        return "Latitude = " + getLatitude() + "\nLongitude = " + getLongitude() + "\n";
     }
 
     @Override
@@ -39,9 +37,11 @@ public class Location_Model {
         }
     }
 
-    // TODO : methode hashCode()
+    // TODO : methode hashCode()  but not obligatory
     @Override
     public int hashCode() {
         return super.hashCode();
     }
+
+
 }
