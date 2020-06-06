@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.Double;
 
+
 public class DataByYear_Model {
     private String year;
     private HashMap<Location_Model, Double> anomalyByLocation;

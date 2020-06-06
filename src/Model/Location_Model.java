@@ -24,7 +24,6 @@ public class Location_Model {
         return a;
     }
 
-    // TODO override equals()
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Location_Model){
@@ -38,5 +37,11 @@ public class Location_Model {
         }else{
             return false;
         }
+    }
+
+    // TODO : methode hashCode()
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
