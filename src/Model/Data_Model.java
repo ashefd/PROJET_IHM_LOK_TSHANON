@@ -4,10 +4,12 @@ import javafx.util.Pair;
 
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
+import java.io.*;
 // TODO : ouvrir le fichier csv, tester les méthodes
 
 
 public class Data_Model {
+
     private ArrayList<DataByYear_Model> period;
     private ArrayList<Location_Model> knowZone;
     private double min;
@@ -59,5 +61,10 @@ public class Data_Model {
         }
         return null;
     }
+
+    public void DataReading(){
+
+    }
+
 
 }
