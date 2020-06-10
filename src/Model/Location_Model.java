@@ -3,8 +3,8 @@ package Model;
 import Exception.*;
 
 public class Location_Model {
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
 
     public Location_Model(double latitude, double longitude){
         this.latitude = latitude;
@@ -26,24 +26,25 @@ public class Location_Model {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Location_Model){
-            if(this.latitude != ((Location_Model) obj).latitude){
-                return false;
-            }else if(this.longitude != ((Location_Model) obj).longitude){
-                return false;
-            }else{
-                return true;
-            }
-        }else{
+        //System.out.println("The equals method is being used");
+        if(this == obj) return true;
+        if(obj == null) return false;
+        if(getClass() != obj.getClass()) return false;
+        Location_Model other = (Location_Model) obj;
+        if(this.latitude != other.getLatitude()){
+            return false;
+        }else if(this.longitude != other.getLongitude()){
             return false;
         }
+        return true;
     }
 
-    // TODO : methode hashCode()  but not obligatory
     @Override
     public int hashCode() {
-        return super.hashCode();
+        final int hash = 31;
+        int result = 1;
+        result = (int) (hash * result + (latitude + longitude));
+        return result;
     }
-
 
 }
