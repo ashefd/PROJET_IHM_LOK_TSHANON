@@ -12,22 +12,23 @@ public class Data_Model {
 
     private ArrayList<DataByYear_Model> period;
     private ArrayList<Location_Model> knownZone; //TODO : do a getKnowZone
-    private double min = 0;
-    private double max = 0;
+    private double min = Double.POSITIVE_INFINITY;
+    private double max = Double.NEGATIVE_INFINITY;
 
-    public Data_Model(){
+    public Data_Model(String path){
         period = new ArrayList<>();
         knownZone = new ArrayList<>();
+        this.readTemperatureFile(path);
     }
 
     public void readTemperatureFile(String path){
+        period = new ArrayList<>();
+        knownZone = new ArrayList<>();
         try {
-            // Placing in the resources file
-
-
                 // FIRST : Opening the CSV file
-            FileReader file = new FileReader("tempanomaly_4x4grid.csv");
+            FileReader file = new FileReader(path);
             BufferedReader bufRead = new BufferedReader(file);
+
             double latitude;
             double longitude;
 
