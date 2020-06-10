@@ -48,14 +48,14 @@ public class Data_Model {
 
                 // THIRD : INITIALISATION OF Data_Model and DataByYear_Model
             while ( line != null) {
-                // Only for the first three line,
+            // Only for the first three line,
                 String[] array = line.split(",");
 
-                // Initialise the position of the anomalies
+            // Initialise the position of the anomalies
                 latitude = Double.parseDouble(array[0]);
                 longitude = Double.parseDouble(array[1]);
 
-                // Adding the anomalies to the right position
+            // Adding the anomalies to the right position
                 for(int i=2; i< array.length; i++){
                     if(array[i].equals("NA")){
                         this.addAnomaly(latitude,longitude, year[i].substring(1,year[i].length()-1),Double.NaN);
@@ -63,8 +63,7 @@ public class Data_Model {
                         this.addAnomaly(latitude,longitude, year[i].substring(1,year[i].length()-1),Double.parseDouble(array[i]));
                     }
                 }
-                //System.out.println("");
-                // Reading the next Line
+            // Reading the next Line
                 line = bufRead.readLine();
             }
 
