@@ -25,6 +25,7 @@ public class DataByYear_Model {
             // The location has already been initialized
             return false;
         }else{
+            // The location has not already been initialized
             anomalyByLocation.put(location, anomalyValue);
             /*System.out.print(year + " ");
             System.out.println(anomalyByLocation.get(location));*/
@@ -49,7 +50,7 @@ public class DataByYear_Model {
         }
     }
 
-    // TODO : method getEveryAnomaly
+    // TODO : method getEveryAnomaly -> sort every key
     public ArrayList<Pair<Location_Model, Double>> getEveryAnomaly(){
         ArrayList<Pair<Location_Model, Double>> result = new ArrayList<>();
         for(Location_Model i : anomalyByLocation.keySet()){

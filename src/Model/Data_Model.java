@@ -121,7 +121,6 @@ public class Data_Model {
         return period.size();
     }
 
-    // TODO : this method
     public ArrayList<java.lang.Double> getEveryAnomaly(double latitude, double longitude){
         ArrayList<java.lang.Double> result = new ArrayList<>();
         Location_Model inter = new Location_Model(latitude,longitude);
@@ -130,6 +129,7 @@ public class Data_Model {
         }
         return result;
     }
+
 
 // TODO this method
     public ArrayList<Pair<Location_Model, Double>> getAnomalyPerYear(String year){
