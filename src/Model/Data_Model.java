@@ -9,7 +9,7 @@ import java.io.*;
 public class Data_Model {
 
     private ArrayList<DataByYear_Model> period;
-    private ArrayList<Location_Model> knownZone; //TODO : do a getKnowZone
+    private ArrayList<Location_Model> knownZone;
     private double min = Double.POSITIVE_INFINITY;
     private double max = Double.NEGATIVE_INFINITY;
 
@@ -75,7 +75,6 @@ public class Data_Model {
     }
 
     public boolean addAnomaly(double latitude, double longitude, String year, double anomalyValue){
-        // TODO : Add the latitude and the longitude to the knownZone
         if(min > anomalyValue){
             min = anomalyValue;
         }else if(max < anomalyValue){
@@ -83,6 +82,16 @@ public class Data_Model {
         }
 
         Location_Model inter = new Location_Model(latitude, longitude);
+
+        boolean inside = false;
+        for(Location_Model i : knownZone){
+            if(i.equals(inter)){
+                inside = true;
+            }
+        }
+        if(!inside){
+            knownZone.add(inter);
+        }
 
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
