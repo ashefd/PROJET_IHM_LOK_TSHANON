@@ -129,9 +129,8 @@ public class Data_Model {
         return result;
     }
 
-
 // TODO this method
-    public ArrayList<Pair<Location_Model, Double>> getAnomalyPerYear(String year){
+    public java.util.List<Pair<Location_Model, Double>> getAnomalyPerYear(String year){
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
                 return i.getEveryAnomaly();

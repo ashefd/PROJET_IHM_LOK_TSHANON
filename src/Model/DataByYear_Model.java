@@ -2,8 +2,7 @@ package Model;
 
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.lang.Double;
 
 
@@ -51,13 +50,36 @@ public class DataByYear_Model {
     }
 
     // TODO : method getEveryAnomaly -> sort every key
-    public ArrayList<Pair<Location_Model, Double>> getEveryAnomaly(){
-        ArrayList<Pair<Location_Model, Double>> result = new ArrayList<>();
+    public List<Pair<Location_Model, Double>> getEveryAnomaly(){
+
+        List<Pair<Location_Model, Double>> sortMe = new ArrayList<>();
+
         for(Location_Model i : anomalyByLocation.keySet()){
-            result.add(new Pair<>(i, anomalyByLocation.get(i)));
+            sortMe.add(new Pair<>(i, anomalyByLocation.get(i)));
         }
-        return result;
+
+        sortMe.sort(new Comparator<Pair<Location_Model, Double>>() {
+            @Override
+            public int compare(Pair<Location_Model, Double> o1, Pair<Location_Model, Double> o2) {
+                if(o1.getKey().getLatitude() == o2.getKey().getLatitude()){
+
+                    if(o1.getKey().getLongitude()<o2.getKey().getLongitude()){
+                        return (int) (o1.getKey().getLongitude()-o2.getKey().getLongitude());
+                    }else{
+                        return (int) (o2.getKey().getLongitude()-o1.getKey().getLongitude());
+                    }
+
+                }else if(o1.getKey().getLatitude()<o2.getKey().getLatitude()){
+                    return (int) (o1.getKey().getLatitude()-o2.getKey().getLatitude());
+
+                }else{
+                    return (int) (o2.getKey().getLatitude()-o1.getKey().getLatitude());
+                }
+            }
+        });
+        return sortMe;
     }
+
 
 
 }

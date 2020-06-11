@@ -1,7 +1,5 @@
 package Model;
 
-import Exception.*;
-
 public class Location_Model {
     private Double latitude;
     private Double longitude;
@@ -46,5 +44,6 @@ public class Location_Model {
         result = (int) (hash * result + (latitude + longitude));
         return result;
     }
+
 
 }
