@@ -1,6 +1,8 @@
 package Model;
 
-public class Location_Model {
+import Exception.*;
+
+public class Location_Model implements Comparable<Location_Model> {
     private Double latitude;
     private Double longitude;
 
@@ -45,5 +47,10 @@ public class Location_Model {
         return result;
     }
 
+    @Override
+    public int compareTo(Location_Model o) {
+        if(this.getLatitude() == o.getLatitude()) return (int) (this.getLongitude() - o.getLongitude());
+        else return (int) (this.getLatitude() - o.getLatitude());
+    }
 
 }

@@ -5,8 +5,6 @@ import javafx.util.Pair;
 import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.io.*;
-// TODO : ouvrir le fichier csv, tester les méthodes
-
 
 public class Data_Model {
 
@@ -83,7 +81,9 @@ public class Data_Model {
         }else if(max < anomalyValue){
             max = anomalyValue;
         }
+
         Location_Model inter = new Location_Model(latitude, longitude);
+
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
                 return i.addData(inter, anomalyValue);
@@ -129,8 +129,7 @@ public class Data_Model {
         return result;
     }
 
-// TODO this method
-    public java.util.List<Pair<Location_Model, Double>> getAnomalyPerYear(String year){
+    public ArrayList<Pair<Location_Model, Double>> getAnomalyPerYear(String year){
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
                 return i.getEveryAnomaly();
