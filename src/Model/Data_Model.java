@@ -10,8 +10,8 @@ public class Data_Model {
 
     private ArrayList<DataByYear_Model> period;
     private ArrayList<Location_Model> knownZone;
-    private double min = Double.POSITIVE_INFINITY;
-    private double max = Double.NEGATIVE_INFINITY;
+    private float min = Float.POSITIVE_INFINITY;
+    private float max = Float.NEGATIVE_INFINITY;
 
     public Data_Model(String path){
         period = new ArrayList<>();
@@ -27,8 +27,8 @@ public class Data_Model {
             FileReader file = new FileReader(path);
             BufferedReader bufRead = new BufferedReader(file);
 
-            double latitude;
-            double longitude;
+            float latitude;
+            float longitude;
 
                 // SECOND : INITIALISATION OF EVERY DataByYear_Model
             // Here : reading the first line
@@ -50,15 +50,15 @@ public class Data_Model {
                 String[] array = line.split(",");
 
             // Initialise the position of the anomalies
-                latitude = Double.parseDouble(array[0]);
-                longitude = Double.parseDouble(array[1]);
+                latitude = Float.parseFloat(array[0]);
+                longitude = Float.parseFloat(array[1]);
 
             // Adding the anomalies to the right position
                 for(int i=2; i< array.length; i++){
                     if(array[i].equals("NA")){
-                        this.addAnomaly(latitude,longitude, year[i].substring(1,year[i].length()-1),Double.NaN);
+                        this.addAnomaly(latitude,longitude, year[i].substring(1,year[i].length()-1),Float.NaN);
                     }else{
-                        this.addAnomaly(latitude,longitude, year[i].substring(1,year[i].length()-1),Double.parseDouble(array[i]));
+                        this.addAnomaly(latitude,longitude, year[i].substring(1,year[i].length()-1),Float.parseFloat(array[i]));
                     }
                 }
             // Reading the next Line
@@ -74,7 +74,7 @@ public class Data_Model {
         }
     }
 
-    public boolean addAnomaly(double latitude, double longitude, String year, double anomalyValue){
+    public boolean addAnomaly(float latitude, float longitude, String year, float anomalyValue){
         if(min > anomalyValue){
             min = anomalyValue;
         }else if(max < anomalyValue){
@@ -101,23 +101,25 @@ public class Data_Model {
         return false;
     }
 
-    public java.lang.Double getValue(double latitude, double longitude, String year){
+    public java.lang.Float getValue(float latitude, float longitude, String year){
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
+                /*
                 System.out.println("Dans la methode getValue de Data_model");
                 System.out.println("On cherche la valeur pour " + i.getYear());
                 System.out.println();
+                */
                 return i.getValue(new Location_Model(latitude, longitude));
             }
         }
         return null;
     }
 
-    public double getMin(){
+    public float getMin(){
         return min;
     }
 
-    public double getMax(){
+    public float getMax(){
         return max;
     }
 
@@ -129,8 +131,8 @@ public class Data_Model {
         return period.size();
     }
 
-    public ArrayList<java.lang.Double> getEveryAnomaly(double latitude, double longitude){
-        ArrayList<java.lang.Double> result = new ArrayList<>();
+    public ArrayList<java.lang.Float> getEveryAnomaly(float latitude, float longitude){
+        ArrayList<java.lang.Float> result = new ArrayList<>();
         Location_Model inter = new Location_Model(latitude,longitude);
         for(DataByYear_Model i : period){
             result.add(i.getValue(inter));
@@ -138,7 +140,7 @@ public class Data_Model {
         return result;
     }
 
-    public ArrayList<Pair<Location_Model, Double>> getAnomalyPerYear(String year){
+    public ArrayList<Pair<Location_Model, Float>> getAnomalyPerYear(String year){
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
                 return i.getEveryAnomaly();

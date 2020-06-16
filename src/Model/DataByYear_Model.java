@@ -3,12 +3,12 @@ package Model;
 import javafx.util.Pair;
 
 import java.util.*;
-import java.lang.Double;
+import java.lang.Float;
 
 
 public class DataByYear_Model {
     private String year;
-    private TreeMap<Location_Model, Double> anomalyByLocation;
+    private TreeMap<Location_Model, Float> anomalyByLocation;
 
     public DataByYear_Model(String year){
         this.year = year;
@@ -19,12 +19,10 @@ public class DataByYear_Model {
         return year;
     }
 
-    public boolean addData(Location_Model location, double anomalyValue){
+    public boolean addData(Location_Model location, float anomalyValue){
         if(anomalyByLocation.containsKey(location)){
-            // The location has already been initialized
             return false;
         }else{
-            // The location has not already been initialized
             anomalyByLocation.put(location, anomalyValue);
             /*System.out.print(year + " ");
             System.out.println(anomalyByLocation.get(location));*/
@@ -32,7 +30,7 @@ public class DataByYear_Model {
         }
     }
 
-    public java.lang.Double getValue(Location_Model location){
+    public java.lang.Float getValue(Location_Model location){
         if(anomalyByLocation.containsKey(location)){
             return anomalyByLocation.get(location);
         }else{
@@ -40,8 +38,8 @@ public class DataByYear_Model {
         }
     }
 
-    public ArrayList<Pair<Location_Model, Double>> getEveryAnomaly(){
-        ArrayList<Pair<Location_Model, Double>> sortMe = new ArrayList<>();
+    public ArrayList<Pair<Location_Model, Float>> getEveryAnomaly(){
+        ArrayList<Pair<Location_Model, Float>> sortMe = new ArrayList<>();
         for(Location_Model i : anomalyByLocation.keySet()){
             sortMe.add(new Pair<>(i, anomalyByLocation.get(i)));
         }

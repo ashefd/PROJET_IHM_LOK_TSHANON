@@ -3,19 +3,19 @@ package Model;
 import Exception.*;
 
 public class Location_Model implements Comparable<Location_Model> {
-    private Double latitude;
-    private Double longitude;
+    private Float latitude;
+    private Float longitude;
 
-    public Location_Model(double latitude, double longitude){
+    public Location_Model(float latitude, float longitude){
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public double getLatitude(){
+    public float getLatitude(){
         return latitude;
     }
 
-    public double getLongitude(){
+    public float getLongitude(){
         return longitude;
     }
 
