@@ -101,7 +101,6 @@ public class Controller{
         scene.setFill(Color.gray(0.12));
         myPane.getChildren().addAll(scene);
 
-
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -127,6 +126,7 @@ public class Controller{
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if(newValue){
+
                     drawAnomalyQuadri(earth);
                 }
             }
@@ -139,11 +139,12 @@ public class Controller{
         Point3D longueur;
         for(Location_Model i : data.getKnowZone()){
             pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
-            longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue())));
+            longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1+data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue())));
             parent.getChildren().add(createLine(pos, longueur));
         }
     }
 
+    // TODO modify the color according to the anomaly value
     private void drawAnomalyQuadri(Group parent){
 
         //Create the color
