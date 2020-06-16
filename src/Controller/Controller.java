@@ -58,6 +58,10 @@ public class Controller{
         mySlider.setMax(2020);
         mySlider.setValue(1880);
 
+        Group group = new Group();
+
+
+
         //Create a Pane et graph scene root for the 3D content
         Group root3D = new Group();
 
@@ -105,19 +109,26 @@ public class Controller{
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 myYear.setText("YEAR : " + newValue.intValue());
+
+                // TODO : Clear the globe
+                earth.getChildren().remove(group);
+                group.getChildren().clear();
+
                 if(radioHistogram.isSelected()){
-                    drawAnomalyHisto(earth);
+                    drawAnomalyHisto(earth, group);
                 }else if(radioQuadrilater.isSelected()){
-                    drawAnomalyQuadri(earth);
+                    drawAnomalyQuadri(earth, group);
                 }
+
             }
         });
 
         radioHistogram.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                group.getChildren().clear();
                 if(newValue){
-                    drawAnomalyHisto(earth);
+                    drawAnomalyHisto(earth,group);
                 }
             }
         });
@@ -125,31 +136,33 @@ public class Controller{
         radioQuadrilater.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                group.getChildren().clear();
                 if(newValue){
-
-                    drawAnomalyQuadri(earth);
+                    drawAnomalyQuadri(earth,group);
                 }
             }
         });
 
     }
 
-    public void drawAnomalyHisto(Group parent){
+    public void drawAnomalyHisto(Group parent, Group other){
         Point3D pos;
         Point3D longueur;
         for(Location_Model i : data.getKnowZone()){
             pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
             longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1+data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue())));
-            parent.getChildren().add(createLine(pos, longueur));
+            other.getChildren().add(createLine(pos, longueur));
         }
+        parent.getChildren().remove(other);
+        parent.getChildren().add(other);
     }
 
     // TODO modify the color according to the anomaly value
-    private void drawAnomalyQuadri(Group parent){
+    private void drawAnomalyQuadri(Group parent, Group other){
 
         //Create the color
         final PhongMaterial red = new PhongMaterial();
-        Color redx = new Color(0,0,0.3, 0.1);
+        Color redx = new Color(0.3,0,0, 0.1);
         red.setDiffuseColor(redx);
         red.setSpecularColor(redx);
 
@@ -158,25 +171,35 @@ public class Controller{
         blue.setDiffuseColor(bluex);
         blue.setSpecularColor(bluex);
 
-
         Point3D topLeft;
         Point3D topRight;
         Point3D bottomLeft;
         Point3D bottomRight;
 
-        for(int lat=-90; lat<90; lat=lat+10){
+        Float value;
 
-            for(int lon=-180; lon<180; lon=lon+10){
+        for(float lat=-88; lat<88; lat=lat+8){
 
-                bottomLeft = geoCoordTo3dCoord(lat-5,lon-5, 1.08f);
-                bottomRight = geoCoordTo3dCoord(lat-5,lon+5, 1.08f);
-                topLeft = geoCoordTo3dCoord(lat+5,lon-5,1.08f);
-                topRight = geoCoordTo3dCoord(lat+5,lon+5, 1.08f);
+            for(float lon=-178; lon<178; lon=lon+8){
+
+                value = data.getValue(lat, lon, Integer.toString((int)mySlider.getValue()));
+
+                bottomLeft = geoCoordTo3dCoord(lat-4,lon-4, 1.01f);
+                bottomRight = geoCoordTo3dCoord(lat-4,lon+4, 1.01f);
+                topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
+                topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
 
                 // adapter selon la temperature de la zone
-                AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, red);
+                if(value > 0){
+                    if(value < 1){
 
+                    }
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, blue, other);
+                }else if(value < 0){
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, red, other);
+                }else{
 
+                }
             }
         }
     }
@@ -190,8 +213,6 @@ public class Controller{
         sphere.setTranslateZ(location.getZ());
         parent.getChildren().add(sphere);
     }
-
-
 
     // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
     public Cylinder createLine(Point3D origin, Point3D target) {
@@ -222,7 +243,7 @@ public class Controller{
                 java.lang.Math.cos(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor))* rayon) ;
     }
 
-    private void AddQuadrilateral(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial material){
+    private void AddQuadrilateral(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial material, Group other){
         final TriangleMesh triangleMesh = new TriangleMesh();
 
         final float[] points = {
@@ -249,7 +270,9 @@ public class Controller{
 
         final MeshView meshView = new MeshView(triangleMesh);
         meshView.setMaterial(material);
-        parent.getChildren().addAll(meshView);
+        parent.getChildren().remove(other);
+        other.getChildren().addAll(meshView);
+        parent.getChildren().addAll(other);
     }
 
 }
