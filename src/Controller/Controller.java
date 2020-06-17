@@ -17,14 +17,14 @@ import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.MeshView;
-import javafx.scene.shape.Sphere;
-import javafx.scene.shape.TriangleMesh;
+import javafx.scene.shape.*;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
@@ -79,6 +79,8 @@ public class Controller{
         mySlider.setMax(2020);
         mySlider.setValue(1880);
 
+        myYear.setText("YEAR : 1880");
+
         speedLecture.setText("1");
 
         Group group = new Group();
@@ -129,11 +131,89 @@ public class Controller{
         myPane.getChildren().addAll(scene);
 
         // Pour la légende
+        Color color1 = new Color(1,0,0, 0.4);
+        final PhongMaterial Color1 = new PhongMaterial();
+        Color1.setDiffuseColor(color1);
+        Color1.setSpecularColor(color1);
+        Rectangle rect1 = new Rectangle(15, 15, 15, 15);
+        rect1.setFill(color1);
+        rect1.setTranslateY(10);
+        Rectangle rectRed = new Rectangle(15,15,15, 70);
+        rectRed.setFill(color1);
+
+        Color color2 = new Color(1,0.3,0, 0.4);
+        final PhongMaterial Color2 = new PhongMaterial();
+        Color2.setDiffuseColor(color2);
+        Color2.setSpecularColor(color2);
+        Rectangle rect2 = new Rectangle(15, 15, 15, 15);
+        rect2.setFill(color2);
+        rect2.setTranslateY(25);
+
+        Color color3 = new Color(1,0.6,0, 0.4);
+        final PhongMaterial Color3 = new PhongMaterial();
+        Color3.setDiffuseColor(color3);
+        Color3.setSpecularColor(color3);
+        Rectangle rect3 = new Rectangle(15, 15, 15, 15);
+        rect3.setFill(color3);
+        rect3.setTranslateY(40);
+
+        Color color4 = new Color(1,0.8,0, 0.4);
+        final PhongMaterial Color4 = new PhongMaterial();
+        Color4.setDiffuseColor(color4);
+        Color4.setSpecularColor(color4);
+        Rectangle rect4 = new Rectangle(15, 15, 15, 15);
+        rect4.setFill(color4);
+        rect4.setTranslateY(55);
+
+        Color color5 = new Color(0.3,0.9,1, 0.4);
+        final PhongMaterial Color5 = new PhongMaterial();
+        Color5.setDiffuseColor(color5);
+        Color5.setSpecularColor(color5);
+        Rectangle rect5 = new Rectangle(15, 15, 15, 15);
+        rect5.setFill(color5);
+        rect5.setTranslateY(70);
+
+        Color color6 = new Color(0,0.6,1, 0.4);
+        final PhongMaterial Color6 = new PhongMaterial();
+        Color6.setDiffuseColor(color6);
+        Color6.setSpecularColor(color6);
+        Rectangle rect6 = new Rectangle(15, 15, 15, 15);
+        rect6.setFill(color6);
+        rect6.setTranslateY(85);
+
+        Color color7 = new Color(0,0.3,1, 0.4);
+        final PhongMaterial Color7 = new PhongMaterial();
+        Color7.setDiffuseColor(color7);
+        Color7.setSpecularColor(color7);
+        Rectangle rect7 = new Rectangle(15, 15, 15, 15);
+        rect7.setFill(color7);
+        rect7.setTranslateY(100);
+
+        Color color8 = new Color(0,0,1, 0.4);
+        final PhongMaterial Color8 = new PhongMaterial();
+        Color8.setDiffuseColor(color8);
+        Color8.setSpecularColor(color8);
+        Rectangle rect8 = new Rectangle(15, 15, 15, 15);
+        rect8.setFill(color8);
+        rect8.setTranslateY(75);
+        Rectangle rectBlue = new Rectangle(15, 15, 15, 70);
+        rectBlue.setFill(color8);
+        rectBlue.setTranslateY(70);
+
+        Label min = new Label();
+        min.setText(Float.toString(data.getMin()));
+        min.setTextFill(Color.WHITE);
+        min.setTranslateY(150);
+
+        Label max = new Label();
+        max.setText(Float.toString(data.getMax()));
+        max.setTextFill(Color.WHITE);
+
         Group root = new Group();
-        SubScene sub = new SubScene(root, 30, 40, true, SceneAntialiasing.BALANCED);
-        sub.setLayoutX(345);
-        sub.setLayoutY(150);
-        myPane.getChildren().addAll(sub);
+
+        SubScene sub = new SubScene(root, 40, 200, true, SceneAntialiasing.BALANCED);
+        sub.setLayoutX(335);
+        sub.setLayoutY(100);
 
 
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -146,9 +226,9 @@ public class Controller{
                 group.getChildren().clear();
 
                 if(radioHistogram.isSelected()){
-                    drawAnomalyHisto(earth, group);
+                    drawAnomalyHisto(earth, group, Color8, Color1);
                 }else if(radioQuadrilater.isSelected()){
-                    drawAnomalyQuadri(earth, group);
+                    drawAnomalyQuadri(earth, group, Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8);
                 }
 
             }
@@ -159,7 +239,14 @@ public class Controller{
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 group.getChildren().clear();
                 if(newValue){
-                    drawAnomalyHisto(earth,group);
+                    myPane.getChildren().remove(root);
+                    root.getChildren().clear();
+
+                    root.getChildren().addAll(rectRed, rectBlue);
+                    root.getChildren().addAll(min, max);
+                    myPane.getChildren().addAll(sub);
+
+                    drawAnomalyHisto(earth,group, Color8, Color1);
                 }
             }
         });
@@ -169,7 +256,14 @@ public class Controller{
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 group.getChildren().clear();
                 if(newValue){
-                    drawAnomalyQuadri(earth,group);
+                    myPane.getChildren().remove(root);
+                    root.getChildren().clear();
+
+                    root.getChildren().addAll(rect1, rect2, rect3, rect4, rect5, rect6, rect7, rect8);
+                    root.getChildren().addAll(min, max);
+                    myPane.getChildren().addAll(sub);
+
+                    drawAnomalyQuadri(earth,group, Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8);
                 }
             }
         });
@@ -183,7 +277,13 @@ public class Controller{
         };
 
         ButtonPlay.setOnAction(e -> {
-            animation.start();
+            if(mySlider.getValue()==2020){
+                mySlider.setValue(1880);
+                animation.start();
+            }else{
+                animation.start();
+            }
+
         });
 
         ButtonPause.setOnAction(e -> {
@@ -210,7 +310,7 @@ public class Controller{
 
 
 
-    public void drawAnomalyHisto(Group parent, Group other){
+    public void drawAnomalyHisto(Group parent, Group other, PhongMaterial Blue, PhongMaterial Red){
         Point3D pos;
         Point3D longueur;
         Float x;
@@ -218,18 +318,19 @@ public class Controller{
             x = data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue()));
             if(x>0){
                 pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
-                longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), x);
-                other.getChildren().add(createLine(pos, longueur));
-            }else{
-
+                longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1+ x);
+                other.getChildren().add(createLine(pos, longueur, Red));
+            }else if(x<0){
+                pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
+                longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1-x);
+                other.getChildren().add(createLine(pos, longueur, Blue));
             }
-
         }
         parent.getChildren().remove(other);
         parent.getChildren().add(other);
     }
 
-    private void drawAnomalyQuadri(Group parent, Group other){
+    private void drawAnomalyQuadri(Group parent, Group other, PhongMaterial Color1, PhongMaterial Color2, PhongMaterial Color3, PhongMaterial Color4, PhongMaterial Color5, PhongMaterial Color6, PhongMaterial Color7, PhongMaterial Color8){
         Point3D topLeft;
         Point3D topRight;
         Point3D bottomLeft;
@@ -248,49 +349,21 @@ public class Controller{
                 topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
                 topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
 
-
-
                 if(3 <= value){
-                    Color colorx = new Color(1,0,0, 0.4);
-                    final PhongMaterial color = new PhongMaterial();
-                    color.setDiffuseColor(colorx);
-                    color.setSpecularColor(colorx);
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color1, other);
                 }else if( (1.5f<=value) && (value<3)){
-                    Color colorx = new Color(1,0.4,0, 0.4);
-                    final PhongMaterial color = new PhongMaterial();
-                    color.setDiffuseColor(colorx);
-                    color.setSpecularColor(colorx);
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color2, other);
                 }else if( (0<=value) && (value<1.5f)){
-                    Color colorx = new Color(1,0.8,0, 0.4);
-                    final PhongMaterial color = new PhongMaterial();
-                    color.setDiffuseColor(colorx);
-                    color.setSpecularColor(colorx);
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color3, other);
                 }else if((-1.5f<=value) && (value<0)){
-                    Color colorx = new Color(0,0.7,1, 0.4);
-                    final PhongMaterial color = new PhongMaterial();
-                    color.setDiffuseColor(colorx);
-                    color.setSpecularColor(colorx);
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color4, other);
                 }else if((-3<=value) && (value<-1.5)){
-                    Color colorx = new Color(0,0.3,1, 0.4);
-                    final PhongMaterial color = new PhongMaterial();
-                    color.setDiffuseColor(colorx);
-                    color.setSpecularColor(colorx);
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color5, other);
                 }else{
-                    Color colorx = new Color(0,0,1, 0.4);
-                    final PhongMaterial color = new PhongMaterial();
-                    color.setDiffuseColor(colorx);
-                    color.setSpecularColor(colorx);
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color6, other);
                 }
             }
         }
-
-// ADD THE CAPTION
     }
 
     public void displayTown(Group parent, String name, float latitude, float longitude){
@@ -304,7 +377,7 @@ public class Controller{
     }
 
     // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
-    public Cylinder createLine(Point3D origin, Point3D target) {
+    public Cylinder createLine(Point3D origin, Point3D target, PhongMaterial Color) {
         Point3D yAxis = new Point3D(0, 1, 0);
         Point3D diff = target.subtract(origin);
         double height = diff.magnitude();
@@ -317,6 +390,7 @@ public class Controller{
         Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
 
         Cylinder line = new Cylinder(0.01f, height, 8);
+        line.setMaterial(Color);
 
         line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
 
