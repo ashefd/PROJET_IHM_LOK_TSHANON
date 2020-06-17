@@ -31,12 +31,15 @@ import javafx.scene.transform.Translate;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertNotEquals;
 
 public class Controller{
 
     private Data_Model data;
+
+    private HashMap<Location_Model, MeshView> laMap;
 
     private static final float TEXTURE_LAT_OFFSET = -0.2f;
     private static final float TEXTURE_LON_OFFSET = 2.8f;
@@ -67,6 +70,12 @@ public class Controller{
 
     @FXML
     private TextField speedLecture;
+
+    @FXML
+    private Label LatitudeLabel;
+
+    @FXML
+    private Label LongitudeLabel;
 
     @FXML
     public void initialize(){
@@ -190,7 +199,8 @@ public class Controller{
         Color8.setSpecularColor(color8);
         Rectangle rect8 = new Rectangle(15, 15, 15, 15);
         rect8.setFill(color8);
-        rect8.setTranslateY(75);
+        rect8.setTranslateY(115);
+
         Rectangle rectBlue = new Rectangle(15, 15, 15, 70);
         rectBlue.setFill(color8);
         rectBlue.setTranslateY(70);
@@ -209,7 +219,6 @@ public class Controller{
         SubScene sub = new SubScene(root, 40, 200, true, SceneAntialiasing.BALANCED);
         sub.setLayoutX(335);
         sub.setLayoutY(100);
-
 
 
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -347,18 +356,22 @@ public class Controller{
                 topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
                 topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
 
-                if(3 <= value){
+                if(8 <= value){
                     AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color1, other);
-                }else if( (1.5f<=value) && (value<3)){
+                }else if( (6<=value) && (value<8)){
                     AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color2, other);
-                }else if( (0<=value) && (value<1.5f)){
+                }else if( (4<=value) && (value<6)){
                     AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color3, other);
-                }else if((-1.5f<=value) && (value<0)){
+                }else if( (2<=value) && (value<4)){
                     AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color4, other);
-                }else if((-3<=value) && (value<-1.5)){
+                }else if( (0<=value) && (value<2f)){
                     AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color5, other);
-                }else{
+                }else if((-2<=value) && (value<0)){
                     AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color6, other);
+                }else if((-4<=value) && (value<-2)){
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color7, other);
+                }else{
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color8, other);
                 }
             }
         }
@@ -394,7 +407,7 @@ public class Controller{
                 java.lang.Math.cos(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor))* rayon) ;
     }
 
-    private void AddQuadrilateral(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial material, Group other){
+    private MeshView AddQuadrilateral(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial material, Group other){
         final TriangleMesh triangleMesh = new TriangleMesh();
 
         final float[] points = {
@@ -421,9 +434,17 @@ public class Controller{
 
         final MeshView meshView = new MeshView(triangleMesh);
         meshView.setMaterial(material);
+
+        meshView.setOnMouseClicked(e -> {
+            LatitudeLabel.setText("Latitude : " + meshView.getTranslateX());
+            LongitudeLabel.setText("Longitude : "+ meshView.getTranslateY());
+        });
+
         parent.getChildren().remove(other);
         other.getChildren().addAll(meshView);
         parent.getChildren().addAll(other);
+        return meshView;
     }
+
 
 }
