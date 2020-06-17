@@ -41,9 +41,6 @@ public class Controller{
     private static final float TEXTURE_LAT_OFFSET = -0.2f;
     private static final float TEXTURE_LON_OFFSET = 2.8f;
 
-    private Float max;
-    private Float min;
-
     @FXML
     private Pane myPane;
 
@@ -84,8 +81,6 @@ public class Controller{
         speedLecture.setText("1");
 
         Group group = new Group();
-        max = data.getMax();
-        min = data.getMin();
 
         //Create a Pane et graph scene root for the 3D content
         Group root3D = new Group();
@@ -216,6 +211,7 @@ public class Controller{
         sub.setLayoutY(100);
 
 
+
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -239,11 +235,12 @@ public class Controller{
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 group.getChildren().clear();
                 if(newValue){
-                    myPane.getChildren().remove(root);
+                    myPane.getChildren().remove(sub);
                     root.getChildren().clear();
 
                     root.getChildren().addAll(rectRed, rectBlue);
                     root.getChildren().addAll(min, max);
+
                     myPane.getChildren().addAll(sub);
 
                     drawAnomalyHisto(earth,group, Color8, Color1);
@@ -256,11 +253,12 @@ public class Controller{
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 group.getChildren().clear();
                 if(newValue){
-                    myPane.getChildren().remove(root);
+                    myPane.getChildren().remove(sub);
                     root.getChildren().clear();
 
                     root.getChildren().addAll(rect1, rect2, rect3, rect4, rect5, rect6, rect7, rect8);
                     root.getChildren().addAll(min, max);
+
                     myPane.getChildren().addAll(sub);
 
                     drawAnomalyQuadri(earth,group, Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8);
@@ -278,9 +276,11 @@ public class Controller{
 
         ButtonPlay.setOnAction(e -> {
             if(mySlider.getValue()==2020){
+                // Si on est à la fin, et que l'on veut directement refaire l'animiation
                 mySlider.setValue(1880);
                 animation.start();
             }else{
+                // Sinon
                 animation.start();
             }
 
@@ -307,8 +307,6 @@ public class Controller{
         });
 
     }
-
-
 
     public void drawAnomalyHisto(Group parent, Group other, PhongMaterial Blue, PhongMaterial Red){
         Point3D pos;
@@ -364,16 +362,6 @@ public class Controller{
                 }
             }
         }
-    }
-
-    public void displayTown(Group parent, String name, float latitude, float longitude){
-        Sphere sphere = new Sphere(0.01);
-        sphere.setId(name);
-        Point3D location = geoCoordTo3dCoord(latitude,longitude, 1);
-        sphere.setTranslateX(location.getX());
-        sphere.setTranslateY(location.getY());
-        sphere.setTranslateZ(location.getZ());
-        parent.getChildren().add(sphere);
     }
 
     // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
