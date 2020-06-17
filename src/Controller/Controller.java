@@ -4,15 +4,21 @@ import Model.Data_Model;
 import Model.Location_Model;
 import com.interactivemesh.jfx.importer.ImportException;
 import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
+import javafx.animation.Animation;
+import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Cylinder;
@@ -30,10 +36,13 @@ import static org.junit.Assert.assertNotEquals;
 
 public class Controller{
 
-    Data_Model data;
+    private Data_Model data;
 
     private static final float TEXTURE_LAT_OFFSET = -0.2f;
     private static final float TEXTURE_LON_OFFSET = 2.8f;
+
+    private Float max;
+    private Float min;
 
     @FXML
     private Pane myPane;
@@ -51,6 +60,18 @@ public class Controller{
     private RadioButton radioQuadrilater;
 
     @FXML
+    private Button ButtonStop;
+
+    @FXML
+    private Button ButtonPause;
+
+    @FXML
+    private Button ButtonPlay;
+
+    @FXML
+    private TextField speedLecture;
+
+    @FXML
     public void initialize(){
         data = new Data_Model("resources/tempanomaly_4x4grid.csv");
 
@@ -58,9 +79,11 @@ public class Controller{
         mySlider.setMax(2020);
         mySlider.setValue(1880);
 
+        speedLecture.setText("1");
+
         Group group = new Group();
-
-
+        max = data.getMax();
+        min = data.getMin();
 
         //Create a Pane et graph scene root for the 3D content
         Group root3D = new Group();
@@ -105,6 +128,14 @@ public class Controller{
         scene.setFill(Color.gray(0.12));
         myPane.getChildren().addAll(scene);
 
+        // Pour la légende
+        Group root = new Group();
+        SubScene sub = new SubScene(root, 30, 40, true, SceneAntialiasing.BALANCED);
+        sub.setLayoutX(345);
+        sub.setLayoutY(150);
+        myPane.getChildren().addAll(sub);
+
+
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -143,34 +174,62 @@ public class Controller{
             }
         });
 
+        AnimationTimer animation = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                double t = Double.parseDouble(speedLecture.getText());
+                mySlider.setValue(mySlider.getValue()+(t/10.0));
+            }
+        };
+
+        ButtonPlay.setOnAction(e -> {
+            animation.start();
+        });
+
+        ButtonPause.setOnAction(e -> {
+            animation.stop();
+        });
+
+        ButtonStop.setOnAction(e -> {
+            animation.stop();
+            mySlider.setValue(1880);
+        });
+
+        speedLecture.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                animation.stop();
+                if(event.getCode().equals(KeyCode.ENTER)){
+                    speedLecture.setText(speedLecture.getText());
+                    animation.start();
+                }
+            }
+        });
+
     }
+
+
 
     public void drawAnomalyHisto(Group parent, Group other){
         Point3D pos;
         Point3D longueur;
+        Float x;
         for(Location_Model i : data.getKnowZone()){
-            pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
-            longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1+data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue())));
-            other.getChildren().add(createLine(pos, longueur));
+            x = data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue()));
+            if(x>0){
+                pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
+                longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), x);
+                other.getChildren().add(createLine(pos, longueur));
+            }else{
+
+            }
+
         }
         parent.getChildren().remove(other);
         parent.getChildren().add(other);
     }
 
-    // TODO modify the color according to the anomaly value
     private void drawAnomalyQuadri(Group parent, Group other){
-
-        //Create the color
-        final PhongMaterial red = new PhongMaterial();
-        Color redx = new Color(0.3,0,0, 0.1);
-        red.setDiffuseColor(redx);
-        red.setSpecularColor(redx);
-
-        final PhongMaterial blue = new PhongMaterial();
-        Color bluex = new Color(0,0,0.3, 0.1);
-        blue.setDiffuseColor(bluex);
-        blue.setSpecularColor(bluex);
-
         Point3D topLeft;
         Point3D topRight;
         Point3D bottomLeft;
@@ -189,19 +248,49 @@ public class Controller{
                 topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
                 topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
 
-                // adapter selon la temperature de la zone
-                if(value > 0){
-                    if(value < 1){
 
-                    }
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, blue, other);
-                }else if(value < 0){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, red, other);
+
+                if(3 <= value){
+                    Color colorx = new Color(1,0,0, 0.4);
+                    final PhongMaterial color = new PhongMaterial();
+                    color.setDiffuseColor(colorx);
+                    color.setSpecularColor(colorx);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                }else if( (1.5f<=value) && (value<3)){
+                    Color colorx = new Color(1,0.4,0, 0.4);
+                    final PhongMaterial color = new PhongMaterial();
+                    color.setDiffuseColor(colorx);
+                    color.setSpecularColor(colorx);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                }else if( (0<=value) && (value<1.5f)){
+                    Color colorx = new Color(1,0.8,0, 0.4);
+                    final PhongMaterial color = new PhongMaterial();
+                    color.setDiffuseColor(colorx);
+                    color.setSpecularColor(colorx);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                }else if((-1.5f<=value) && (value<0)){
+                    Color colorx = new Color(0,0.7,1, 0.4);
+                    final PhongMaterial color = new PhongMaterial();
+                    color.setDiffuseColor(colorx);
+                    color.setSpecularColor(colorx);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
+                }else if((-3<=value) && (value<-1.5)){
+                    Color colorx = new Color(0,0.3,1, 0.4);
+                    final PhongMaterial color = new PhongMaterial();
+                    color.setDiffuseColor(colorx);
+                    color.setSpecularColor(colorx);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
                 }else{
-
+                    Color colorx = new Color(0,0,1, 0.4);
+                    final PhongMaterial color = new PhongMaterial();
+                    color.setDiffuseColor(colorx);
+                    color.setSpecularColor(colorx);
+                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, color, other);
                 }
             }
         }
+
+// ADD THE CAPTION
     }
 
     public void displayTown(Group parent, String name, float latitude, float longitude){
@@ -227,7 +316,7 @@ public class Controller{
         double angle = Math.acos(diff.normalize().dotProduct(yAxis));
         Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
 
-        Cylinder line = new Cylinder(0.01f, height);
+        Cylinder line = new Cylinder(0.01f, height, 8);
 
         line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
 

@@ -37,16 +37,16 @@
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Animations's speed" />
             <HBox prefHeight="63.0" prefWidth="169.0">
                <children>
-                  <TextField prefHeight="25.0" prefWidth="64.0" />
+                  <TextField fx:id="speedLecture" prefHeight="25.0" prefWidth="64.0" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="year(s)/sec" wrappingWidth="86.94595336914062" />
                </children>
             </HBox>
             <Separator prefWidth="200.0" />
             <HBox prefHeight="41.0" prefWidth="169.0" spacing="10.0">
                <children>
-                  <Button mnemonicParsing="false" text="Stop" />
-                  <Button mnemonicParsing="false" text="Pause" />
-                  <Button mnemonicParsing="false" text="Play" />
+                  <Button fx:id="ButtonStop" mnemonicParsing="false" text="Stop" />
+                  <Button fx:id="ButtonPause" mnemonicParsing="false" text="Pause" />
+                  <Button fx:id="ButtonPlay" mnemonicParsing="false" text="Play" />
                </children>
                <padding>
                   <Insets left="7.0" right="6.0" />
