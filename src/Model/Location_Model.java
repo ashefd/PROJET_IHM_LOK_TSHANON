@@ -1,6 +1,5 @@
 package Model;
 
-import Exception.*;
 
 public class Location_Model implements Comparable<Location_Model> {
     private Float latitude;

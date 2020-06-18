@@ -89,6 +89,8 @@ public class Controller{
 
         speedLecture.setText("1");
 
+        laMap = new HashMap<>();
+
         Group group = new Group();
 
         //Create a Pane et graph scene root for the 3D content
@@ -133,6 +135,8 @@ public class Controller{
         scene.setCamera(camera);
         scene.setFill(Color.gray(0.12));
         myPane.getChildren().addAll(scene);
+
+        initQuadri(earth);
 
         // Pour la légende
         Color color1 = new Color(1,0,0, 0.4);
@@ -201,6 +205,11 @@ public class Controller{
         rect8.setFill(color8);
         rect8.setTranslateY(115);
 
+        Color color9 = new Color(0.1,0.1,0.1, 0.7);
+        final PhongMaterial Color9 = new PhongMaterial();
+        Color9.setDiffuseColor(color9);
+        Color9.setSpecularColor(color9);
+
         Rectangle rectBlue = new Rectangle(15, 15, 15, 70);
         rectBlue.setFill(color8);
         rectBlue.setTranslateY(70);
@@ -233,7 +242,7 @@ public class Controller{
                 if(radioHistogram.isSelected()){
                     drawAnomalyHisto(earth, group, Color8, Color1);
                 }else if(radioQuadrilater.isSelected()){
-                    drawAnomalyQuadri(earth, group, Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8);
+                    drawQuadri(Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8, Color9);
                 }
 
             }
@@ -244,6 +253,7 @@ public class Controller{
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 group.getChildren().clear();
                 if(newValue){
+
                     myPane.getChildren().remove(sub);
                     root.getChildren().clear();
 
@@ -251,6 +261,8 @@ public class Controller{
                     root.getChildren().addAll(min, max);
 
                     myPane.getChildren().addAll(sub);
+
+                    setTransparentMeshView();
 
                     drawAnomalyHisto(earth,group, Color8, Color1);
                 }
@@ -262,6 +274,7 @@ public class Controller{
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 group.getChildren().clear();
                 if(newValue){
+
                     myPane.getChildren().remove(sub);
                     root.getChildren().clear();
 
@@ -270,7 +283,7 @@ public class Controller{
 
                     myPane.getChildren().addAll(sub);
 
-                    drawAnomalyQuadri(earth,group, Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8);
+                    drawQuadri(Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8, Color9);
                 }
             }
         });
@@ -337,46 +350,6 @@ public class Controller{
         parent.getChildren().add(other);
     }
 
-    private void drawAnomalyQuadri(Group parent, Group other, PhongMaterial Color1, PhongMaterial Color2, PhongMaterial Color3, PhongMaterial Color4, PhongMaterial Color5, PhongMaterial Color6, PhongMaterial Color7, PhongMaterial Color8){
-        Point3D topLeft;
-        Point3D topRight;
-        Point3D bottomLeft;
-        Point3D bottomRight;
-
-        Float value;
-
-        for(float lat=-88; lat<88; lat=lat+8){
-
-            for(float lon=-178; lon<178; lon=lon+8){
-
-                value = data.getValue(lat, lon, Integer.toString((int)mySlider.getValue()));
-
-                bottomLeft = geoCoordTo3dCoord(lat-4,lon-4, 1.01f);
-                bottomRight = geoCoordTo3dCoord(lat-4,lon+4, 1.01f);
-                topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
-                topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
-
-                if(8 <= value){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color1, other);
-                }else if( (6<=value) && (value<8)){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color2, other);
-                }else if( (4<=value) && (value<6)){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color3, other);
-                }else if( (2<=value) && (value<4)){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color4, other);
-                }else if( (0<=value) && (value<2f)){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color5, other);
-                }else if((-2<=value) && (value<0)){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color6, other);
-                }else if((-4<=value) && (value<-2)){
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color7, other);
-                }else{
-                    AddQuadrilateral(parent,topRight,bottomRight, bottomLeft, topLeft, Color8, other);
-                }
-            }
-        }
-    }
-
     // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
     public Cylinder createLine(Point3D origin, Point3D target, PhongMaterial Color) {
         Point3D yAxis = new Point3D(0, 1, 0);
@@ -390,7 +363,7 @@ public class Controller{
         double angle = Math.acos(diff.normalize().dotProduct(yAxis));
         Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
 
-        Cylinder line = new Cylinder(0.01f, height, 8);
+        Cylinder line = new Cylinder(0.01f, height/2, 2);
         line.setMaterial(Color);
 
         line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
@@ -407,7 +380,74 @@ public class Controller{
                 java.lang.Math.cos(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor))* rayon) ;
     }
 
-    private MeshView AddQuadrilateral(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial material, Group other){
+    private void drawQuadri(PhongMaterial Color1, PhongMaterial Color2, PhongMaterial Color3, PhongMaterial Color4, PhongMaterial Color5, PhongMaterial Color6, PhongMaterial Color7, PhongMaterial Color8, PhongMaterial Color9){
+
+        Float value;
+        MeshView mesh;
+
+        for(float lat=-88; lat<88; lat=lat+8){
+
+            for(float lon=-178; lon<178; lon=lon+8){
+
+                value = data.getValue(lat, lon, Integer.toString((int)mySlider.getValue()));
+                mesh = laMap.get(new Location_Model(lat,lon));
+
+                if(6 <= value){
+                    mesh.setMaterial(Color1);
+                }else if( (4<=value) && (value<6)){
+                    mesh.setMaterial(Color2);
+                }else if( (2<=value) && (value<4)){
+                    mesh.setMaterial(Color3);
+                }else if( (0<=value) && (value<2)){
+                    mesh.setMaterial(Color4);
+                }else if( (-2<=value) && (value<0)){
+                    mesh.setMaterial(Color5);
+                }else if((-4<=value) && (value<-2)){
+                    mesh.setMaterial(Color6);
+                }else if((-6<=value) && (value<-4)){
+                    mesh.setMaterial(Color7);
+                }else if(value <-6){
+                    mesh.setMaterial(Color8);
+                }else{
+                    mesh.setMaterial(Color9);
+                }
+            }
+        }
+    }
+
+    private void setTransparentMeshView(){
+        PhongMaterial transparent = new PhongMaterial();
+        transparent.setSpecularColor(Color.TRANSPARENT);
+        transparent.setDiffuseColor(Color.TRANSPARENT);
+
+        for(Location_Model i : laMap.keySet()){
+            laMap.get(i).setMaterial(transparent);
+        }
+    }
+
+    private void initQuadri(Group parent){
+        Point3D topLeft;
+        Point3D topRight;
+        Point3D bottomLeft;
+        Point3D bottomRight;
+
+        for(float lat=-88; lat<88; lat=lat+8){
+
+            for(float lon=-178; lon<178; lon=lon+8){
+
+                bottomLeft = geoCoordTo3dCoord(lat-4,lon-4, 1.01f);
+                bottomRight = geoCoordTo3dCoord(lat-4,lon+4, 1.01f);
+                topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
+                topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
+
+                laMap.put(new Location_Model(lat,lon),AddQuadri(parent,topRight,bottomRight, bottomLeft, topLeft));
+            }
+        }
+
+
+    }
+
+    private MeshView AddQuadri(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft){
         final TriangleMesh triangleMesh = new TriangleMesh();
 
         final float[] points = {
@@ -433,18 +473,19 @@ public class Controller{
         triangleMesh.getFaces().setAll(faces);
 
         final MeshView meshView = new MeshView(triangleMesh);
-        meshView.setMaterial(material);
 
         meshView.setOnMouseClicked(e -> {
             LatitudeLabel.setText("Latitude : " + meshView.getTranslateX());
             LongitudeLabel.setText("Longitude : "+ meshView.getTranslateY());
         });
 
-        parent.getChildren().remove(other);
-        other.getChildren().addAll(meshView);
-        parent.getChildren().addAll(other);
+        PhongMaterial transparent = new PhongMaterial();
+        transparent.setSpecularColor(Color.TRANSPARENT);
+        transparent.setDiffuseColor(Color.TRANSPARENT);
+        meshView.setMaterial(transparent);
+        parent.getChildren().addAll(meshView);
+
         return meshView;
     }
-
 
 }
