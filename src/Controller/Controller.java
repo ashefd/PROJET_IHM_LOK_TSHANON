@@ -40,6 +40,7 @@ public class Controller{
     private Data_Model data;
 
     private HashMap<Location_Model, MeshView> laMap;
+    private HashMap<Location_Model, Cylinder> histoMap;
 
     private static final float TEXTURE_LAT_OFFSET = -0.2f;
     private static final float TEXTURE_LON_OFFSET = 2.8f;
@@ -90,8 +91,7 @@ public class Controller{
         speedLecture.setText("1");
 
         laMap = new HashMap<>();
-
-        Group group = new Group();
+        histoMap = new HashMap<>();
 
         //Create a Pane et graph scene root for the 3D content
         Group root3D = new Group();
@@ -135,8 +135,6 @@ public class Controller{
         scene.setCamera(camera);
         scene.setFill(Color.gray(0.12));
         myPane.getChildren().addAll(scene);
-
-        initQuadri(earth);
 
         // Pour la légende
         Color color1 = new Color(1,0,0, 0.4);
@@ -210,6 +208,10 @@ public class Controller{
         Color9.setDiffuseColor(color9);
         Color9.setSpecularColor(color9);
 
+        PhongMaterial transparent = new PhongMaterial();
+        transparent.setSpecularColor(Color.TRANSPARENT);
+        transparent.setDiffuseColor(Color.TRANSPARENT);
+
         Rectangle rectBlue = new Rectangle(15, 15, 15, 70);
         rectBlue.setFill(color8);
         rectBlue.setTranslateY(70);
@@ -223,6 +225,9 @@ public class Controller{
         max.setText(Float.toString(data.getMax()));
         max.setTextFill(Color.WHITE);
 
+        initQuadri(earth, transparent);
+        initHisto(earth, transparent);
+
         Group root = new Group();
 
         SubScene sub = new SubScene(root, 40, 200, true, SceneAntialiasing.BALANCED);
@@ -235,12 +240,8 @@ public class Controller{
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 myYear.setText("YEAR : " + newValue.intValue());
 
-                // TODO : Clear the globe
-                earth.getChildren().remove(group);
-                group.getChildren().clear();
-
                 if(radioHistogram.isSelected()){
-                    drawAnomalyHisto(earth, group, Color8, Color1);
+                    drawHisto(Color8, Color1);
                 }else if(radioQuadrilater.isSelected()){
                     drawQuadri(Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8, Color9);
                 }
@@ -251,7 +252,7 @@ public class Controller{
         radioHistogram.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                group.getChildren().clear();
+
                 if(newValue){
 
                     myPane.getChildren().remove(sub);
@@ -262,9 +263,8 @@ public class Controller{
 
                     myPane.getChildren().addAll(sub);
 
-                    setTransparentMeshView();
-
-                    drawAnomalyHisto(earth,group, Color8, Color1);
+                    setTransparentMeshView(transparent);
+                    drawHisto(Color8, Color1);
                 }
             }
         });
@@ -272,7 +272,7 @@ public class Controller{
         radioQuadrilater.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                group.getChildren().clear();
+
                 if(newValue){
 
                     myPane.getChildren().remove(sub);
@@ -282,6 +282,8 @@ public class Controller{
                     root.getChildren().addAll(min, max);
 
                     myPane.getChildren().addAll(sub);
+
+                    setTransparentCylinder(transparent);
 
                     drawQuadri(Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8, Color9);
                 }
@@ -330,54 +332,71 @@ public class Controller{
 
     }
 
-    public void drawAnomalyHisto(Group parent, Group other, PhongMaterial Blue, PhongMaterial Red){
-        Point3D pos;
-        Point3D longueur;
-        Float x;
-        for(Location_Model i : data.getKnowZone()){
-            x = data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue()));
-            if(x>0){
-                pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
-                longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1+ x);
-                other.getChildren().add(createLine(pos, longueur, Red));
-            }else if(x<0){
-                pos = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1);
-                longueur = geoCoordTo3dCoord(i.getLatitude(), i.getLongitude(), 1-x);
-                other.getChildren().add(createLine(pos, longueur, Blue));
+    private void initQuadri(Group parent, PhongMaterial transparent){
+        Point3D topLeft;
+        Point3D topRight;
+        Point3D bottomLeft;
+        Point3D bottomRight;
+
+        for(float lat=-88; lat<88; lat=lat+8){
+
+            for(float lon=-178; lon<178; lon=lon+8){
+
+                bottomLeft = geoCoordTo3dCoord(lat-4,lon-4, 1.01f);
+                bottomRight = geoCoordTo3dCoord(lat-4,lon+4, 1.01f);
+                topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
+                topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
+
+                MeshView meshView = AddQuadri(parent,topRight,bottomRight, bottomLeft, topLeft, transparent);
+
+                float finalLat = lat;
+                float finalLon = lon;
+                meshView.setOnMouseClicked(e -> {
+                    LatitudeLabel.setText("Latitude : " + finalLat);
+                    LongitudeLabel.setText("Longitude : "+ finalLon );
+                });
+
+                laMap.put(new Location_Model(lat,lon),meshView);
             }
         }
-        parent.getChildren().remove(other);
-        parent.getChildren().add(other);
     }
 
-    // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
-    public Cylinder createLine(Point3D origin, Point3D target, PhongMaterial Color) {
-        Point3D yAxis = new Point3D(0, 1, 0);
-        Point3D diff = target.subtract(origin);
-        double height = diff.magnitude();
+    private void initHisto(Group parent, PhongMaterial transparent){
 
-        Point3D mid = target.midpoint(origin);
-        Translate moveToMidpoint = new Translate(mid.getX(), mid.getY(), mid.getZ());
+        for(float lat=-88; lat<88; lat=lat+8){
 
-        Point3D axisOfRotation = diff.crossProduct(yAxis);
-        double angle = Math.acos(diff.normalize().dotProduct(yAxis));
-        Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
+            for(float lon=-178; lon<178; lon=lon+8) {
+                Float x = data.getValue(lat, lon, Integer.toString((int)mySlider.getValue()));
+                Point3D pos = geoCoordTo3dCoord(lat, lon, 1);
+                Point3D longueur = geoCoordTo3dCoord(lat, lon, 1.1f);
+                Cylinder line = createLine(pos, longueur, transparent);
 
-        Cylinder line = new Cylinder(0.01f, height/2, 2);
-        line.setMaterial(Color);
+                histoMap.put(new Location_Model(lat, lon), line);
+                parent.getChildren().add(line);
 
-        line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
-
-        return line;
+            }
+        }
     }
 
-    public static Point3D geoCoordTo3dCoord(float lat, float lon, float rayon) {
-        float lat_cor = lat + TEXTURE_LAT_OFFSET;
-        float lon_cor = lon + TEXTURE_LON_OFFSET;
-        return new Point3D(
-                -java.lang.Math.sin(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor)) * rayon,
-                -java.lang.Math.sin(java.lang.Math.toRadians(lat_cor)) * rayon,
-                java.lang.Math.cos(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor))* rayon) ;
+    private void drawHisto(PhongMaterial Blue, PhongMaterial Red){
+        Float x;
+        for(Location_Model i : histoMap.keySet()){
+            x = data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue()));
+
+            if(x>=0){
+                histoMap.get(i).setMaterial(Red);
+                histoMap.get(i).setHeight(Math.round(x*100)/100f);
+            }else if(x<0){
+                histoMap.get(i).setMaterial(Blue);
+                histoMap.get(i).setHeight(Math.round(-x*100)/100f);
+            }
+        }
+    }
+
+    private void setTransparentCylinder(PhongMaterial transparent){
+        for(Location_Model i : histoMap.keySet()){
+            histoMap.get(i).setMaterial(transparent);
+        }
     }
 
     private void drawQuadri(PhongMaterial Color1, PhongMaterial Color2, PhongMaterial Color3, PhongMaterial Color4, PhongMaterial Color5, PhongMaterial Color6, PhongMaterial Color7, PhongMaterial Color8, PhongMaterial Color9){
@@ -415,39 +434,7 @@ public class Controller{
         }
     }
 
-    private void setTransparentMeshView(){
-        PhongMaterial transparent = new PhongMaterial();
-        transparent.setSpecularColor(Color.TRANSPARENT);
-        transparent.setDiffuseColor(Color.TRANSPARENT);
-
-        for(Location_Model i : laMap.keySet()){
-            laMap.get(i).setMaterial(transparent);
-        }
-    }
-
-    private void initQuadri(Group parent){
-        Point3D topLeft;
-        Point3D topRight;
-        Point3D bottomLeft;
-        Point3D bottomRight;
-
-        for(float lat=-88; lat<88; lat=lat+8){
-
-            for(float lon=-178; lon<178; lon=lon+8){
-
-                bottomLeft = geoCoordTo3dCoord(lat-4,lon-4, 1.01f);
-                bottomRight = geoCoordTo3dCoord(lat-4,lon+4, 1.01f);
-                topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
-                topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
-
-                laMap.put(new Location_Model(lat,lon),AddQuadri(parent,topRight,bottomRight, bottomLeft, topLeft));
-            }
-        }
-
-
-    }
-
-    private MeshView AddQuadri(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft){
+    private MeshView AddQuadri(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial transparent){
         final TriangleMesh triangleMesh = new TriangleMesh();
 
         final float[] points = {
@@ -473,19 +460,48 @@ public class Controller{
         triangleMesh.getFaces().setAll(faces);
 
         final MeshView meshView = new MeshView(triangleMesh);
-
-        meshView.setOnMouseClicked(e -> {
-            LatitudeLabel.setText("Latitude : " + meshView.getTranslateX());
-            LongitudeLabel.setText("Longitude : "+ meshView.getTranslateY());
-        });
-
-        PhongMaterial transparent = new PhongMaterial();
-        transparent.setSpecularColor(Color.TRANSPARENT);
-        transparent.setDiffuseColor(Color.TRANSPARENT);
         meshView.setMaterial(transparent);
         parent.getChildren().addAll(meshView);
 
         return meshView;
     }
+
+    // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
+    public Cylinder createLine(Point3D origin, Point3D target, PhongMaterial Color) {
+        Point3D yAxis = new Point3D(0, 1, 0);
+        Point3D diff = target.subtract(origin);
+        double height = diff.magnitude();
+
+        Point3D mid = target.midpoint(origin);
+        Translate moveToMidpoint = new Translate(mid.getX(), mid.getY(), mid.getZ());
+
+        Point3D axisOfRotation = diff.crossProduct(yAxis);
+        double angle = Math.acos(diff.normalize().dotProduct(yAxis));
+        Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
+
+        Cylinder line = new Cylinder(0.01f, height/2, 2);
+        line.setMaterial(Color);
+
+        line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
+
+        return line;
+    }
+
+    private void setTransparentMeshView(PhongMaterial transparent){
+        for(Location_Model i : laMap.keySet()){
+            laMap.get(i).setMaterial(transparent);
+        }
+    }
+
+    public static Point3D geoCoordTo3dCoord(float lat, float lon, float rayon) {
+        float lat_cor = lat + TEXTURE_LAT_OFFSET;
+        float lon_cor = lon + TEXTURE_LON_OFFSET;
+        return new Point3D(
+                -java.lang.Math.sin(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor)) * rayon,
+                -java.lang.Math.sin(java.lang.Math.toRadians(lat_cor)) * rayon,
+                java.lang.Math.cos(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor))* rayon) ;
+    }
+
+
 
 }
