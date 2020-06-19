@@ -320,8 +320,11 @@ public class Controller {
         AnimationTimer animation = new AnimationTimer() {
             @Override
             public void handle(long now) {
+                if (!speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$")){
+                    speedLecture.setText("1");
+                }
                 double t = Double.parseDouble(speedLecture.getText());
-                mySlider.setValue(mySlider.getValue()+(t/10.0));
+                mySlider.setValue(mySlider.getValue()+(t/60.0));
             }
         };
 
@@ -359,6 +362,9 @@ public class Controller {
         });
 
     }
+
+
+
 
     private void initQuadri(Group parent, PhongMaterial transparent){
         Point3D topLeft;
@@ -402,6 +408,7 @@ public class Controller {
         }
     }
 
+
     private void initHisto(Group parent, PhongMaterial transparent){
 
         for(float lat=-88; lat<=88; lat=lat+8){
@@ -419,6 +426,7 @@ public class Controller {
         }
     }
 
+
     private void drawHisto(PhongMaterial Blue, PhongMaterial Red){
         Float x;
         for(Location_Model i : histoMap.keySet()){
@@ -434,11 +442,13 @@ public class Controller {
         }
     }
 
+
     private void setTransparentCylinder(PhongMaterial transparent){
         for(Location_Model i : histoMap.keySet()){
             histoMap.get(i).setMaterial(transparent);
         }
     }
+
 
     private void drawQuadri(PhongMaterial Color1, PhongMaterial Color2, PhongMaterial Color3, PhongMaterial Color4, PhongMaterial Color5, PhongMaterial Color6, PhongMaterial Color7, PhongMaterial Color8, PhongMaterial Color9){
 
@@ -475,6 +485,7 @@ public class Controller {
         }
     }
 
+
     private MeshView AddQuadri(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial transparent){
         final TriangleMesh triangleMesh = new TriangleMesh();
 
@@ -507,6 +518,7 @@ public class Controller {
         return meshView;
     }
 
+
     // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
     public Cylinder createLine(Point3D origin, Point3D target, PhongMaterial Color) {
         Point3D yAxis = new Point3D(0, 1, 0);
@@ -528,11 +540,13 @@ public class Controller {
         return line;
     }
 
+
     private void setTransparentMeshView(PhongMaterial transparent){
         for(Location_Model i : laMap.keySet()){
             laMap.get(i).setMaterial(transparent);
         }
     }
+
 
     public static Point3D geoCoordTo3dCoord(float lat, float lon, float rayon) {
         float lat_cor = lat + TEXTURE_LAT_OFFSET;
