@@ -320,9 +320,6 @@ public class Controller {
         AnimationTimer animation = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$")){
-                    speedLecture.setText("1");
-                }
                 double t = Double.parseDouble(speedLecture.getText());
                 mySlider.setValue(mySlider.getValue()+(t/60.0));
             }
@@ -334,7 +331,9 @@ public class Controller {
                 mySlider.setValue(1880);
                 animation.start();
             }else{
-                // Sinon
+                if (!speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$")){
+                    speedLecture.setText("1");
+                }
                 animation.start();
             }
         });
@@ -352,11 +351,12 @@ public class Controller {
             @Override
             public void handle(KeyEvent event) {
                 animation.stop();
-                if (speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$")){
-                    if(event.getCode().equals(KeyCode.ENTER)){
-                        speedLecture.setText(speedLecture.getText());
-                        animation.start();
+                if (speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$") && event.getCode().equals(KeyCode.ENTER)){
+                    if(mySlider.getValue() == 2020){
+                        mySlider.setValue(1880);
                     }
+                    speedLecture.setText(speedLecture.getText());
+                    animation.start();
                 }
             }
         });
