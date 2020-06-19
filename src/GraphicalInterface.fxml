@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <AnchorPane fx:id="myAnchorPane" maxHeight="663.0" maxWidth="728.0" minHeight="400.0" minWidth="600.0" prefHeight="663.0" prefWidth="728.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.Controller">
@@ -24,9 +25,15 @@
          <children>
             <VBox prefHeight="390.0" prefWidth="282.0" spacing="5.0">
                <children>
-                  <Label fx:id="myYear" prefHeight="17.0" prefWidth="161.0" text="YEAR :" />
+                  <Label fx:id="myYear" prefHeight="53.0" prefWidth="180.0" text="YEAR :">
+                     <font>
+                        <Font size="30.0" />
+                     </font></Label>
                   <Separator prefWidth="200.0" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Modelisation :" />
+                  <Text fill="#00000099" strokeType="OUTSIDE" strokeWidth="0.0" text="Modelisation :">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Text>
                   <RadioButton fx:id="radioHistogram" mnemonicParsing="false" text="Histogram">
                      <toggleGroup>
                         <ToggleGroup fx:id="modelisation" />
@@ -34,14 +41,23 @@
                   </RadioButton>
                   <RadioButton fx:id="radioQuadrilater" mnemonicParsing="false" text="Quadrilater" toggleGroup="$modelisation" />
                   <Separator prefWidth="200.0" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Representation :" />
+                  <Text fill="#00000099" strokeType="OUTSIDE" strokeWidth="0.0" text="Representation :">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Text>
                   <CheckBox fx:id="myGraph" mnemonicParsing="false" text="Graphic 2D" />
                   <Separator prefWidth="200.0" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Position :" />
+                  <Text fill="#00000099" strokeType="OUTSIDE" strokeWidth="0.0" text="Position :">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Text>
                   <Label fx:id="LatitudeLabel" prefHeight="17.0" prefWidth="168.0" text="Latitude :" />
                   <Label fx:id="LongitudeLabel" prefHeight="17.0" prefWidth="171.0" text="Longitute :" />
                   <Separator prefWidth="200.0" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Animations's speed" />
+                  <Text fill="#00000098" strokeType="OUTSIDE" strokeWidth="0.0" text="Animations's speed">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Text>
                   <HBox prefHeight="63.0" prefWidth="169.0" spacing="10.0">
                      <children>
                         <TextField fx:id="speedLecture" prefHeight="25.0" prefWidth="64.0" />
