@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
@@ -9,62 +12,76 @@
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<HBox fx:id="myHbox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="5.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.Controller">
+<AnchorPane fx:id="myAnchorPane" maxHeight="663.0" maxWidth="728.0" minHeight="400.0" minWidth="600.0" prefHeight="663.0" prefWidth="728.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.Controller">
    <children>
-      <VBox prefHeight="400.0" prefWidth="209.0" spacing="5.0">
+      <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="390.0" prefWidth="721.0" spacing="5.0">
          <children>
-            <Label fx:id="myYear" prefHeight="17.0" prefWidth="161.0" text="YEAR :" />
-            <Separator prefWidth="200.0" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Modelisation :" />
-            <RadioButton fx:id="radioHistogram" mnemonicParsing="false" text="Histogram">
-               <toggleGroup>
-                  <ToggleGroup fx:id="modelisation" />
-               </toggleGroup></RadioButton>
-            <RadioButton fx:id="radioQuadrilater" mnemonicParsing="false" text="Quadrilater" toggleGroup="$modelisation" />
-            <Separator prefWidth="200.0" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Representation :" />
-            <CheckBox fx:id="myGraph" mnemonicParsing="false" text="Graphic 2D" />
-            <Separator prefWidth="200.0" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Position :" />
-            <Label fx:id="LatitudeLabel" prefHeight="17.0" prefWidth="168.0" text="Latitude :" />
-            <Label fx:id="LongitudeLabel" prefHeight="17.0" prefWidth="171.0" text="Longitute :" />
-            <Separator prefWidth="200.0" />
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Animations's speed" />
-            <HBox prefHeight="63.0" prefWidth="169.0">
+            <VBox prefHeight="390.0" prefWidth="282.0" spacing="5.0">
                <children>
-                  <TextField fx:id="speedLecture" prefHeight="25.0" prefWidth="64.0" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="year(s)/sec" wrappingWidth="86.94595336914062" />
-               </children>
-            </HBox>
-            <Separator prefWidth="200.0" />
-            <HBox prefHeight="41.0" prefWidth="169.0" spacing="10.0">
-               <children>
-                  <Button fx:id="ButtonStop" mnemonicParsing="false" text="Stop" />
-                  <Button fx:id="ButtonPause" mnemonicParsing="false" text="Pause" />
-                  <Button fx:id="ButtonPlay" mnemonicParsing="false" text="Play" />
+                  <Label fx:id="myYear" prefHeight="17.0" prefWidth="161.0" text="YEAR :" />
+                  <Separator prefWidth="200.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Modelisation :" />
+                  <RadioButton fx:id="radioHistogram" mnemonicParsing="false" text="Histogram">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="modelisation" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="radioQuadrilater" mnemonicParsing="false" text="Quadrilater" toggleGroup="$modelisation" />
+                  <Separator prefWidth="200.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Representation :" />
+                  <CheckBox fx:id="myGraph" mnemonicParsing="false" text="Graphic 2D" />
+                  <Separator prefWidth="200.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Position :" />
+                  <Label fx:id="LatitudeLabel" prefHeight="17.0" prefWidth="168.0" text="Latitude :" />
+                  <Label fx:id="LongitudeLabel" prefHeight="17.0" prefWidth="171.0" text="Longitute :" />
+                  <Separator prefWidth="200.0" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Animations's speed" />
+                  <HBox prefHeight="63.0" prefWidth="169.0" spacing="10.0">
+                     <children>
+                        <TextField fx:id="speedLecture" prefHeight="25.0" prefWidth="64.0" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="year(s)/sec" wrappingWidth="86.94595336914062" />
+                     </children>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+                  <HBox prefHeight="41.0" prefWidth="169.0" spacing="10.0">
+                     <children>
+                        <Button fx:id="ButtonStop" mnemonicParsing="false" text="Stop" />
+                        <Button fx:id="ButtonPause" mnemonicParsing="false" text="Pause" />
+                        <Button fx:id="ButtonPlay" mnemonicParsing="false" text="Play" />
+                     </children>
+                     <padding>
+                        <Insets left="7.0" right="6.0" />
+                     </padding>
+                  </HBox>
                </children>
                <padding>
-                  <Insets left="7.0" right="6.0" />
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
-            </HBox>
+            </VBox>
+            <VBox prefHeight="390.0" prefWidth="617.0" spacing="5.0">
+               <children>
+                  <Pane fx:id="myPane" prefHeight="349.0" prefWidth="501.0" />
+                  <Slider fx:id="mySlider" prefHeight="25.0" prefWidth="397.0" />
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </VBox>
          </children>
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-      </VBox>
-      <VBox prefHeight="400.0" prefWidth="427.0" spacing="5.0">
-         <children>
-            <Pane fx:id="myPane" prefHeight="347.0" prefWidth="397.0" />
-            <Slider fx:id="mySlider" prefHeight="25.0" prefWidth="397.0" />
-         </children>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
-      </VBox>
+      </HBox>
+      <LineChart fx:id="graphic" layoutX="3.0" layoutY="382.0" legendSide="RIGHT" legendVisible="false" prefHeight="279.0" prefWidth="721.0" title="Evolution of temperature from 1880 to 2020">
+        <xAxis>
+          <CategoryAxis animated="false" label="Year" prefHeight="21.0" prefWidth="510.0" side="BOTTOM" fx:id="xAxis" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxis" animated="false" label="Anomaly" lowerBound="-9.0" minorTickCount="0" side="LEFT" upperBound="9.0" />
+        </yAxis>
+      </LineChart>
    </children>
-</HBox>
+</AnchorPane>

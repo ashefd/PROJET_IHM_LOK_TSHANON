@@ -11,7 +11,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         try{
             Parent content = FXMLLoader.load(getClass().getResource("GraphicalInterface.fxml"));
-            primaryStage.setTitle("Controller.Earth Test");
+            primaryStage.setTitle("Gloal Warming 3D");
             primaryStage.setScene(new Scene(content));
             primaryStage.show();
         } catch (IOException e){

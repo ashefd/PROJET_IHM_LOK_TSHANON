@@ -1,5 +1,6 @@
 package Controller;
 
+import Model.DataByYear_Model;
 import Model.Data_Model;
 import Model.Location_Model;
 import com.interactivemesh.jfx.importer.ImportException;
@@ -14,10 +15,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -44,6 +47,9 @@ public class Controller{
 
     private static final float TEXTURE_LAT_OFFSET = -0.2f;
     private static final float TEXTURE_LON_OFFSET = 2.8f;
+
+    @FXML
+    private AnchorPane myAnchorPane;
 
     @FXML
     private Pane myPane;
@@ -79,14 +85,22 @@ public class Controller{
     private Label LongitudeLabel;
 
     @FXML
+    private CheckBox myGraph;
+
+    @FXML
+    private LineChart graphic;
+
+    @FXML
     public void initialize(){
         data = new Data_Model("resources/tempanomaly_4x4grid.csv");
+
 
         mySlider.setMin(1880);
         mySlider.setMax(2020);
         mySlider.setValue(1880);
-
         myYear.setText("YEAR : 1880");
+
+        myGraph.setSelected(true);
 
         speedLecture.setText("1");
 
@@ -131,7 +145,7 @@ public class Controller{
         root3D.getChildren().add(ambientLight);
 
         // Create scene
-        SubScene scene = new SubScene(root3D, 390, 350, true, SceneAntialiasing.BALANCED );
+        SubScene scene = new SubScene(root3D, 501, 349, true, SceneAntialiasing.BALANCED );
         scene.setCamera(camera);
         scene.setFill(Color.gray(0.12));
         myPane.getChildren().addAll(scene);
@@ -231,7 +245,7 @@ public class Controller{
         Group root = new Group();
 
         SubScene sub = new SubScene(root, 40, 200, true, SceneAntialiasing.BALANCED);
-        sub.setLayoutX(335);
+        sub.setLayoutX(435);
         sub.setLayoutY(100);
 
 
@@ -239,7 +253,6 @@ public class Controller{
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 myYear.setText("YEAR : " + newValue.intValue());
-
                 if(radioHistogram.isSelected()){
                     drawHisto(Color8, Color1);
                 }else if(radioQuadrilater.isSelected()){
@@ -290,6 +303,22 @@ public class Controller{
             }
         });
 
+        myGraph.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                //graphic.getData().clear();
+                if(newValue){
+                    graphic.getData().clear();
+                    graphic.setVisible(true);
+
+                    // Augmenter la taille de la fenetre
+                }else{
+                    graphic.setVisible(false);
+                    // Diminuer la taille de la fenetre
+                }
+            }
+        });
+
         AnimationTimer animation = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -300,14 +329,13 @@ public class Controller{
 
         ButtonPlay.setOnAction(e -> {
             if(mySlider.getValue()==2020){
-                // Si on est à la fin, et que l'on veut directement refaire l'animiation
+                // Si on est à la fin, et que l'on veut directement refaire l'animation
                 mySlider.setValue(1880);
                 animation.start();
             }else{
                 // Sinon
                 animation.start();
             }
-
         });
 
         ButtonPause.setOnAction(e -> {
@@ -338,22 +366,35 @@ public class Controller{
         Point3D bottomLeft;
         Point3D bottomRight;
 
-        for(float lat=-88; lat<88; lat=lat+8){
+        for(float lat=-88; lat<=88; lat=lat+8){
 
-            for(float lon=-178; lon<178; lon=lon+8){
+            for(float lon=-178; lon<=178; lon=lon+8){
 
                 bottomLeft = geoCoordTo3dCoord(lat-4,lon-4, 1.01f);
                 bottomRight = geoCoordTo3dCoord(lat-4,lon+4, 1.01f);
                 topLeft = geoCoordTo3dCoord(lat+4,lon-4,1.01f);
                 topRight = geoCoordTo3dCoord(lat+4,lon+4, 1.01f);
 
-                MeshView meshView = AddQuadri(parent,topRight,bottomRight, bottomLeft, topLeft, transparent);
+                MeshView meshView = AddQuadri(parent, topRight,bottomRight, bottomLeft, topLeft, transparent);
 
                 float finalLat = lat;
                 float finalLon = lon;
+
                 meshView.setOnMouseClicked(e -> {
                     LatitudeLabel.setText("Latitude : " + finalLat);
-                    LongitudeLabel.setText("Longitude : "+ finalLon );
+                    LongitudeLabel.setText("Longitude : " + finalLon);
+
+                    XYChart.Series series = new XYChart.Series();
+                    int j = 1880;
+                    for(Float i : data.getEveryAnomaly(finalLat, finalLon)){
+                        if(!i.equals(Float.NaN)){
+                            series.getData().add(new XYChart.Data(Integer.toString(j),i));
+                        }else{
+                            series.getData().add(new XYChart.Data(Integer.toString(j),0));
+                        }
+                        j=j+1;
+                    }
+                    graphic.getData().add(series);
                 });
 
                 laMap.put(new Location_Model(lat,lon),meshView);
@@ -363,9 +404,9 @@ public class Controller{
 
     private void initHisto(Group parent, PhongMaterial transparent){
 
-        for(float lat=-88; lat<88; lat=lat+8){
+        for(float lat=-88; lat<=88; lat=lat+8){
 
-            for(float lon=-178; lon<178; lon=lon+8) {
+            for(float lon=-178; lon<=178; lon=lon+8) {
                 Float x = data.getValue(lat, lon, Integer.toString((int)mySlider.getValue()));
                 Point3D pos = geoCoordTo3dCoord(lat, lon, 1);
                 Point3D longueur = geoCoordTo3dCoord(lat, lon, 1.1f);
