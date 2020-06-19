@@ -389,8 +389,6 @@ public class Controller{
                     for(Float i : data.getEveryAnomaly(finalLat, finalLon)){
                         if(!i.equals(Float.NaN)){
                             series.getData().add(new XYChart.Data(Integer.toString(j),i));
-                        }else{
-                            series.getData().add(new XYChart.Data(Integer.toString(j),0));
                         }
                         j=j+1;
                     }
