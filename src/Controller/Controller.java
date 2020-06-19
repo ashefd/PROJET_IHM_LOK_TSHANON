@@ -33,12 +33,11 @@ import javafx.scene.transform.Translate;
 
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.UnaryOperator;
 
-import static org.junit.Assert.assertNotEquals;
 
-public class Controller{
+public class Controller {
 
     private Data_Model data;
 
@@ -48,8 +47,7 @@ public class Controller{
     private static final float TEXTURE_LAT_OFFSET = -0.2f;
     private static final float TEXTURE_LON_OFFSET = 2.8f;
 
-    @FXML
-    private AnchorPane myAnchorPane;
+    private UnaryOperator<TextFormatter.Change> filter;
 
     @FXML
     private Pane myPane;
@@ -93,7 +91,6 @@ public class Controller{
     @FXML
     public void initialize(){
         data = new Data_Model("resources/tempanomaly_4x4grid.csv");
-
 
         mySlider.setMin(1880);
         mySlider.setMax(2020);
@@ -314,6 +311,7 @@ public class Controller{
                     // Augmenter la taille de la fenetre
                 }else{
                     graphic.setVisible(false);
+
                     // Diminuer la taille de la fenetre
                 }
             }
@@ -351,9 +349,11 @@ public class Controller{
             @Override
             public void handle(KeyEvent event) {
                 animation.stop();
-                if(event.getCode().equals(KeyCode.ENTER)){
-                    speedLecture.setText(speedLecture.getText());
-                    animation.start();
+                if (speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$")){
+                    if(event.getCode().equals(KeyCode.ENTER)){
+                        speedLecture.setText(speedLecture.getText());
+                        animation.start();
+                    }
                 }
             }
         });
@@ -542,7 +542,5 @@ public class Controller{
                 -java.lang.Math.sin(java.lang.Math.toRadians(lat_cor)) * rayon,
                 java.lang.Math.cos(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor))* rayon) ;
     }
-
-
 
 }
