@@ -5,7 +5,6 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
@@ -39,13 +38,13 @@
                         <ToggleGroup fx:id="modelisation" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="radioQuadrilater" mnemonicParsing="false" text="Quadrilater" toggleGroup="$modelisation" />
+                  <RadioButton fx:id="radioQuadrilater" mnemonicParsing="false" text="Quadrilateral" toggleGroup="$modelisation" />
                   <Separator prefWidth="200.0" />
-                  <Text fill="#00000099" strokeType="OUTSIDE" strokeWidth="0.0" text="Representation :">
+                  <Text fill="#00000099" strokeType="OUTSIDE" strokeWidth="0.0" text="Representation : ">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font></Text>
-                  <CheckBox fx:id="myGraph" mnemonicParsing="false" text="Graphic 2D" />
+                  <Button fx:id="myGraph" mnemonicParsing="false" text="Clear graphic 2D" />
                   <Separator prefWidth="200.0" />
                   <Text fill="#00000099" strokeType="OUTSIDE" strokeWidth="0.0" text="Position :">
                      <font>

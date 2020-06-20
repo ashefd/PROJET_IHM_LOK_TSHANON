@@ -7,6 +7,8 @@ import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
@@ -15,12 +17,15 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import org.w3c.dom.events.EventListener;
 
 
 import java.net.URL;
@@ -31,6 +36,7 @@ import java.util.function.UnaryOperator;
 public class Controller {
 
     private Data_Model data;
+    private double place;
 
     private HashMap<Location_Model, MeshView> laMap;
     private HashMap<Location_Model, Cylinder> histoMap;
@@ -74,7 +80,7 @@ public class Controller {
     private Label LongitudeLabel;
 
     @FXML
-    private CheckBox myGraph;
+    private Button myGraph;
 
     @FXML
     private LineChart graphic;
@@ -88,8 +94,7 @@ public class Controller {
         mySlider.setValue(1880);
         myYear.setText("YEAR : 1880");
 
-        myGraph.setSelected(true);
-
+        graphic.setCreateSymbols(false);
         speedLecture.setText("1");
 
         laMap = new HashMap<>();
@@ -138,72 +143,70 @@ public class Controller {
         scene.setFill(Color.gray(0.12));
         myPane.getChildren().addAll(scene);
 
-        // Pour la légende
+
+
+        place = 180;
+
         Color color1 = new Color(1,0,0, 0.4);
         final PhongMaterial Color1 = new PhongMaterial();
         Color1.setDiffuseColor(color1);
         Color1.setSpecularColor(color1);
-        Rectangle rect1 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect1 = new Rectangle(place + 140, 5, 20, 20);
         rect1.setFill(color1);
-        rect1.setTranslateY(10);
-        Rectangle rectRed = new Rectangle(15,15,15, 70);
+        Rectangle rectRed = new Rectangle(place+85,5,70, 20);
         rectRed.setFill(color1);
 
         Color color2 = new Color(1,0.3,0, 0.4);
         final PhongMaterial Color2 = new PhongMaterial();
         Color2.setDiffuseColor(color2);
         Color2.setSpecularColor(color2);
-        Rectangle rect2 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect2 = new Rectangle(place+ 120, 5, 20, 20);
         rect2.setFill(color2);
-        rect2.setTranslateY(25);
 
         Color color3 = new Color(1,0.6,0, 0.4);
         final PhongMaterial Color3 = new PhongMaterial();
         Color3.setDiffuseColor(color3);
         Color3.setSpecularColor(color3);
-        Rectangle rect3 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect3 = new Rectangle(place+ 100, 5, 20, 20);
         rect3.setFill(color3);
-        rect3.setTranslateY(40);
 
         Color color4 = new Color(1,0.8,0, 0.4);
         final PhongMaterial Color4 = new PhongMaterial();
         Color4.setDiffuseColor(color4);
         Color4.setSpecularColor(color4);
-        Rectangle rect4 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect4 = new Rectangle(place+80, 5, 20, 20);
         rect4.setFill(color4);
-        rect4.setTranslateY(55);
 
         Color color5 = new Color(0.3,0.9,1, 0.4);
         final PhongMaterial Color5 = new PhongMaterial();
         Color5.setDiffuseColor(color5);
         Color5.setSpecularColor(color5);
-        Rectangle rect5 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect5 = new Rectangle(place+ 60, 5, 20, 20);
         rect5.setFill(color5);
-        rect5.setTranslateY(70);
 
         Color color6 = new Color(0,0.6,1, 0.4);
         final PhongMaterial Color6 = new PhongMaterial();
         Color6.setDiffuseColor(color6);
         Color6.setSpecularColor(color6);
-        Rectangle rect6 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect6 = new Rectangle(place+40, 5, 20, 20);
         rect6.setFill(color6);
-        rect6.setTranslateY(85);
 
         Color color7 = new Color(0,0.3,1, 0.4);
         final PhongMaterial Color7 = new PhongMaterial();
         Color7.setDiffuseColor(color7);
         Color7.setSpecularColor(color7);
-        Rectangle rect7 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect7 = new Rectangle(place+20, 5, 20, 20);
         rect7.setFill(color7);
-        rect7.setTranslateY(100);
 
         Color color8 = new Color(0,0,1, 0.4);
         final PhongMaterial Color8 = new PhongMaterial();
         Color8.setDiffuseColor(color8);
         Color8.setSpecularColor(color8);
-        Rectangle rect8 = new Rectangle(15, 15, 15, 15);
+        Rectangle rect8 = new Rectangle(place, 5, 20, 20);
         rect8.setFill(color8);
-        rect8.setTranslateY(115);
+
+        Rectangle rectBlue = new Rectangle(place, 5, 70, 20);
+        rectBlue.setFill(color8);
 
         Color color9 = new Color(0.1,0.1,0.1, 0.7);
         final PhongMaterial Color9 = new PhongMaterial();
@@ -214,27 +217,37 @@ public class Controller {
         transparent.setSpecularColor(Color.TRANSPARENT);
         transparent.setDiffuseColor(Color.TRANSPARENT);
 
-        Rectangle rectBlue = new Rectangle(15, 15, 15, 70);
-        rectBlue.setFill(color8);
-        rectBlue.setTranslateY(70);
-
-        Label min = new Label();
-        min.setText(Float.toString(data.getMin()));
-        min.setTextFill(Color.WHITE);
-        min.setTranslateY(150);
-
-        Label max = new Label();
-        max.setText(Float.toString(data.getMax()));
-        max.setTextFill(Color.WHITE);
 
         initQuadri(earth, transparent);
         initHisto(earth, transparent);
 
+
+        // Caption + min + max
         Group root = new Group();
 
-        SubScene sub = new SubScene(root, 40, 200, true, SceneAntialiasing.BALANCED);
-        sub.setLayoutX(435);
-        sub.setLayoutY(100);
+            // Explain
+        Label text = new Label();
+        text.setText("Temperature - ");
+        text.setTextFill(Color.WHITE);
+
+            // Min
+        Label min = new Label();
+        min.setText("Minimum : " + Float.toString(data.getMin()));
+        min.setTextFill(Color.WHITE);
+        min.setTranslateY(10);
+
+            // Max
+        Label max = new Label();
+        max.setText("Maximum : " + Float.toString(data.getMax()));
+        max.setTextFill(Color.WHITE);
+        max.setTranslateY(20);
+
+            // Creating the subscene
+        SubScene sub = new SubScene(root, 700, 100, true, SceneAntialiasing.BALANCED);
+        sub.setLayoutX(5);
+        sub.setLayoutY(310);
+        root.getChildren().addAll(text, min, max);
+        myPane.getChildren().addAll(sub);
 
 
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -250,6 +263,7 @@ public class Controller {
             }
         });
 
+
         radioHistogram.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -260,7 +274,7 @@ public class Controller {
                     root.getChildren().clear();
 
                     root.getChildren().addAll(rectRed, rectBlue);
-                    root.getChildren().addAll(min, max);
+                    root.getChildren().addAll(text, min, max);
 
                     myPane.getChildren().addAll(sub);
 
@@ -269,6 +283,7 @@ public class Controller {
                 }
             }
         });
+
 
         radioQuadrilater.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -280,7 +295,7 @@ public class Controller {
                     root.getChildren().clear();
 
                     root.getChildren().addAll(rect1, rect2, rect3, rect4, rect5, rect6, rect7, rect8);
-                    root.getChildren().addAll(min, max);
+                    root.getChildren().addAll(text, min, max);
 
                     myPane.getChildren().addAll(sub);
 
@@ -291,22 +306,14 @@ public class Controller {
             }
         });
 
-        myGraph.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+        myGraph.setOnAction(new EventHandler<ActionEvent>() {
             @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                //graphic.getData().clear();
-                if(newValue){
-                    graphic.getData().clear();
-                    graphic.setVisible(true);
-
-                    // Augmenter la taille de la fenetre
-                }else{
-                    graphic.setVisible(false);
-
-                    // Diminuer la taille de la fenetre
-                }
+            public void handle(ActionEvent event) {
+                graphic.getData().clear();
             }
         });
+
 
         AnimationTimer animation = new AnimationTimer() {
             @Override
@@ -315,6 +322,7 @@ public class Controller {
                 mySlider.setValue(mySlider.getValue()+(t/60.0));
             }
         };
+
 
         ButtonPlay.setOnAction(e -> {
             if(mySlider.getValue()==2020){
@@ -329,14 +337,17 @@ public class Controller {
             }
         });
 
+
         ButtonPause.setOnAction(e -> {
             animation.stop();
         });
+
 
         ButtonStop.setOnAction(e -> {
             animation.stop();
             mySlider.setValue(1880);
         });
+
 
         speedLecture.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -381,6 +392,7 @@ public class Controller {
 
                     XYChart.Series series = new XYChart.Series();
                     int j = 1880;
+
                     for(Float i : data.getEveryAnomaly(finalLat, finalLon)){
                         if(!i.equals(Float.NaN)){
                             series.getData().add(new XYChart.Data(Integer.toString(j),i));
@@ -389,6 +401,7 @@ public class Controller {
                         }
                         j=j+1;
                     }
+
                     graphic.getData().add(series);
                 });
 
