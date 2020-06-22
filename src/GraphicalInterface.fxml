@@ -18,9 +18,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="myAnchorPane" maxHeight="663.0" maxWidth="728.0" minHeight="400.0" minWidth="600.0" prefHeight="663.0" prefWidth="728.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.Controller">
+<AnchorPane fx:id="myAnchorPane" maxHeight="663.0" maxWidth="986.0" minHeight="400.0" minWidth="600.0" prefHeight="663.0" prefWidth="868.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.Controller">
    <children>
-      <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="390.0" prefWidth="721.0" spacing="5.0">
+      <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="380.0" prefWidth="868.0" spacing="5.0">
          <children>
             <VBox prefHeight="390.0" prefWidth="282.0" spacing="5.0">
                <children>
@@ -79,9 +79,9 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
             </VBox>
-            <VBox prefHeight="390.0" prefWidth="617.0" spacing="5.0">
+            <VBox prefHeight="380.0" prefWidth="579.0" spacing="5.0">
                <children>
-                  <Pane fx:id="myPane" prefHeight="349.0" prefWidth="501.0" />
+                  <Pane fx:id="myPane" prefHeight="349.0" prefWidth="441.0" />
                   <Slider fx:id="mySlider" prefHeight="25.0" prefWidth="397.0" />
                </children>
                <padding>
@@ -90,7 +90,7 @@
             </VBox>
          </children>
       </HBox>
-      <LineChart fx:id="graphic" layoutX="3.0" layoutY="382.0" legendSide="RIGHT" legendVisible="false" prefHeight="279.0" prefWidth="721.0" title="Evolution of temperature from 1880 to 2020">
+      <LineChart fx:id="graphic" layoutX="-4.0" layoutY="382.0" legendSide="RIGHT" prefHeight="279.0" prefWidth="875.0" title="Evolution of temperature from 1880 to 2020">
         <xAxis>
           <CategoryAxis animated="false" label="Year" prefHeight="21.0" prefWidth="510.0" side="BOTTOM" fx:id="xAxis" />
         </xAxis>

@@ -7,7 +7,6 @@ import com.interactivemesh.jfx.importer.obj.ObjModelImporter;
 import javafx.animation.AnimationTimer;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -25,7 +24,6 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
-import org.w3c.dom.events.EventListener;
 
 
 import java.net.URL;
@@ -36,7 +34,6 @@ import java.util.function.UnaryOperator;
 public class Controller {
 
     private Data_Model data;
-    private double place;
 
     private HashMap<Location_Model, MeshView> laMap;
     private HashMap<Location_Model, Cylinder> histoMap;
@@ -87,16 +84,18 @@ public class Controller {
 
     @FXML
     public void initialize(){
-        data = new Data_Model("resources/tempanomaly_4x4grid.csv");
+        //Getting the data
+        data = new Data_Model("src/resources/tempanomaly_4x4grid.csv");
 
+        // Initializing the view
         mySlider.setMin(1880);
         mySlider.setMax(2020);
         mySlider.setValue(1880);
         myYear.setText("YEAR : 1880");
-
         graphic.setCreateSymbols(false);
         speedLecture.setText("1");
 
+        // Creating the Hashmap
         laMap = new HashMap<>();
         histoMap = new HashMap<>();
 
@@ -138,15 +137,14 @@ public class Controller {
         root3D.getChildren().add(ambientLight);
 
         // Create scene
-        SubScene scene = new SubScene(root3D, 501, 349, true, SceneAntialiasing.BALANCED );
+        SubScene scene = new SubScene(root3D, 555, 349, true, SceneAntialiasing.BALANCED );
         scene.setCamera(camera);
         scene.setFill(Color.gray(0.12));
         myPane.getChildren().addAll(scene);
 
 
-
-        place = 180;
-
+        // Creating the Color and associating it to a rectangle for the caption
+        double place = 180;
         Color color1 = new Color(1,0,0, 0.4);
         final PhongMaterial Color1 = new PhongMaterial();
         Color1.setDiffuseColor(color1);
@@ -217,10 +215,9 @@ public class Controller {
         transparent.setSpecularColor(Color.TRANSPARENT);
         transparent.setDiffuseColor(Color.TRANSPARENT);
 
-
+        // Initialization of the Quadrilateral and the histogram
         initQuadri(earth, transparent);
         initHisto(earth, transparent);
-
 
         // Caption + min + max
         Group root = new Group();
@@ -250,62 +247,74 @@ public class Controller {
         myPane.getChildren().addAll(sub);
 
 
+        // adding Listener
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                // everytime slider's value is changing, representation of anomaly will change too
+
+                    //Changing the text
                 myYear.setText("YEAR : " + newValue.intValue());
                 if(radioHistogram.isSelected()){
+                    //Changing the histogram representation
                     drawHisto(Color8, Color1);
                 }else if(radioQuadrilater.isSelected()){
+                    //Changing the quadrilateral representation
                     drawQuadri(Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8, Color9);
                 }
 
             }
         });
-
 
         radioHistogram.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 
                 if(newValue){
-
+                    // Making sure that we don't put again the subscene
                     myPane.getChildren().remove(sub);
                     root.getChildren().clear();
 
+                    // Adding to the root for the caption
                     root.getChildren().addAll(rectRed, rectBlue);
                     root.getChildren().addAll(text, min, max);
 
+                    // Adding to the pane
                     myPane.getChildren().addAll(sub);
 
+                    // Setting the quadrilateral as transparent
                     setTransparentMeshView(transparent);
+
+                    // Drawing the histogram
                     drawHisto(Color8, Color1);
                 }
             }
         });
-
 
         radioQuadrilater.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 
                 if(newValue){
-
+                    // Making sure that we don't put again the subscene
                     myPane.getChildren().remove(sub);
                     root.getChildren().clear();
 
+                    // Adding to the root for the caption
                     root.getChildren().addAll(rect1, rect2, rect3, rect4, rect5, rect6, rect7, rect8);
                     root.getChildren().addAll(text, min, max);
 
+                    // Adding to the pane
                     myPane.getChildren().addAll(sub);
 
+                    // Setting the cylinders as transparent
                     setTransparentCylinder(transparent);
 
+                    // Drawing the quadrilateral with the right color
                     drawQuadri(Color1, Color2, Color3, Color4, Color5, Color6, Color7, Color8, Color9);
                 }
             }
         });
-
 
         myGraph.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -313,7 +322,6 @@ public class Controller {
                 graphic.getData().clear();
             }
         });
-
 
         AnimationTimer animation = new AnimationTimer() {
             @Override
@@ -323,37 +331,35 @@ public class Controller {
             }
         };
 
-
         ButtonPlay.setOnAction(e -> {
             if(mySlider.getValue()==2020){
-                // Si on est à la fin, et que l'on veut directement refaire l'animation
+                // If this is the end of the animation but we want to watch it again
                 mySlider.setValue(1880);
                 animation.start();
             }else{
+                // Making sure that the value is correct
                 if (!speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$")){
+                    // If the value is not correct, set the animation's speed at 1
                     speedLecture.setText("1");
                 }
                 animation.start();
             }
         });
-
-
         ButtonPause.setOnAction(e -> {
             animation.stop();
         });
-
-
         ButtonStop.setOnAction(e -> {
             animation.stop();
             mySlider.setValue(1880);
         });
 
-
         speedLecture.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 animation.stop();
+                // Making sure that the value is correct
                 if (speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$") && event.getCode().equals(KeyCode.ENTER)){
+                    // If it is the end of the animation but we want to watch it again
                     if(mySlider.getValue() == 2020){
                         mySlider.setValue(1880);
                     }
@@ -364,6 +370,8 @@ public class Controller {
         });
 
     }
+
+
 
 
     private void initQuadri(Group parent, PhongMaterial transparent){
@@ -395,21 +403,44 @@ public class Controller {
 
                     for(Float i : data.getEveryAnomaly(finalLat, finalLon)){
                         if(!i.equals(Float.NaN)){
-                            series.getData().add(new XYChart.Data(Integer.toString(j),i));
-                        }else{
-                            series.getData().add(new XYChart.Data(Integer.toString(j),0));
+                            XYChart.Data<String, Float> Data = new XYChart.Data(Integer.toString(j),i);
+                            Data.setNode(new HoverAndClicked(Integer.toString(j), i));
+                            series.getData().add(Data);
+                            series.setName("Latitude : " + finalLat + " , longitude : " + finalLon);
                         }
                         j=j+1;
                     }
 
                     graphic.getData().add(series);
+
+                    series.getNode().setOnMouseEntered(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            series.getNode().setScaleY(1.1);
+                        }
+                    });
+
+                    series.getNode().setOnMouseExited(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            series.getNode().setScaleY(1);
+                        }
+                    });
+
+                    series.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            // Add point to the globe
+                            addLocation(parent, finalLat, finalLon);
+                        }
+                    });
+
                 });
 
                 laMap.put(new Location_Model(lat,lon),meshView);
             }
         }
     }
-
 
     private void initHisto(Group parent, PhongMaterial transparent){
 
@@ -428,7 +459,6 @@ public class Controller {
         }
     }
 
-
     private void drawHisto(PhongMaterial Blue, PhongMaterial Red){
         Float x;
         for(Location_Model i : histoMap.keySet()){
@@ -444,13 +474,11 @@ public class Controller {
         }
     }
 
-
     private void setTransparentCylinder(PhongMaterial transparent){
         for(Location_Model i : histoMap.keySet()){
             histoMap.get(i).setMaterial(transparent);
         }
     }
-
 
     private void drawQuadri(PhongMaterial Color1, PhongMaterial Color2, PhongMaterial Color3, PhongMaterial Color4, PhongMaterial Color5, PhongMaterial Color6, PhongMaterial Color7, PhongMaterial Color8, PhongMaterial Color9){
 
@@ -487,7 +515,6 @@ public class Controller {
         }
     }
 
-
     private MeshView AddQuadri(Group parent, Point3D topRight, Point3D bottomRight, Point3D bottomLeft, Point3D topLeft, PhongMaterial transparent){
         final TriangleMesh triangleMesh = new TriangleMesh();
 
@@ -520,7 +547,6 @@ public class Controller {
         return meshView;
     }
 
-
     // From Rahel Lüthy : https://netzwerg.ch/blog/2015/03/22/javafx-3d-line/
     public Cylinder createLine(Point3D origin, Point3D target, PhongMaterial Color) {
         Point3D yAxis = new Point3D(0, 1, 0);
@@ -542,13 +568,11 @@ public class Controller {
         return line;
     }
 
-
     private void setTransparentMeshView(PhongMaterial transparent){
         for(Location_Model i : laMap.keySet()){
             laMap.get(i).setMaterial(transparent);
         }
     }
-
 
     public static Point3D geoCoordTo3dCoord(float lat, float lon, float rayon) {
         float lat_cor = lat + TEXTURE_LAT_OFFSET;
@@ -558,5 +582,61 @@ public class Controller {
                 -java.lang.Math.sin(java.lang.Math.toRadians(lat_cor)) * rayon,
                 java.lang.Math.cos(java.lang.Math.toRadians(lon_cor)) * java.lang.Math.cos(java.lang.Math.toRadians(lat_cor))* rayon) ;
     }
+
+    public void addLocation(Group parent, float latitude, float longitude){
+        Sphere sphere = new Sphere(0.1);
+
+        Point3D location = geoCoordTo3dCoord(latitude,longitude, 1);
+        sphere.setTranslateX(location.getX());
+        sphere.setTranslateY(location.getY());
+        sphere.setTranslateZ(location.getZ());
+
+        parent.getChildren().add(sphere);
+        sphere.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                parent.getChildren().remove(sphere);
+            }
+        });
+    }
+
+
+
+    // Internal class
+    public class HoverAndClicked extends StackPane {
+
+        public HoverAndClicked(String string, Object object){
+
+            final Label label = new Label(object + "");
+
+            // Show the value of the anomaly
+            setOnMouseEntered(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    label.getStyleClass().addAll("chart-line-symbol");
+                    label.setMinSize(Label.USE_PREF_SIZE, Label.USE_PREF_SIZE);
+                    getChildren().setAll(label);
+                    toFront();
+                }
+            });
+
+            // Clear it
+            setOnMouseExited(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    getChildren().clear();
+                }
+            });
+
+            // Set the year from the value selected
+            setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    mySlider.setValue(Integer.parseInt(string));
+                }
+            });
+        }
+    }
+
 
 }
