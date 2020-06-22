@@ -24,6 +24,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import org.junit.platform.engine.support.hierarchical.OpenTest4JAwareThrowableCollector;
 
 
 import java.net.URL;
@@ -563,6 +564,7 @@ public class Controller {
 
     public void addLocation(Group parent, float latitude, float longitude){
         Sphere sphere = new Sphere(0.1);
+        sphere.setId(Float.toString(latitude)+"-"+Float.toString(longitude));
 
         Point3D location = geoCoordTo3dCoord(latitude,longitude, 1);
         sphere.setTranslateX(location.getX());
@@ -611,7 +613,17 @@ public class Controller {
                 @Override
                 public void handle(MouseEvent event) {
                     mySlider.setValue(Integer.parseInt(string));
-                    addLocation(parent, lat, lon);
+                    boolean inside = false;
+                    for(Node node : parent.getChildren()) {  // Making sure that only one sphere will be drawn
+                        if(node.getId() == null){
+                            // Do nothing
+                        }else if(node.getId().equals(Float.toString(lat)+"-"+Float.toString(lon))){
+                            inside = true;
+                        }
+                    }
+                    if(!inside){
+                        addLocation(parent, lat, lon);
+                    }
                 }
             });
         }
