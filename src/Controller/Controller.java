@@ -404,7 +404,7 @@ public class Controller {
                     for(Float i : data.getEveryAnomaly(finalLat, finalLon)){
                         if(!i.equals(Float.NaN)){
                             XYChart.Data<String, Float> Data = new XYChart.Data(Integer.toString(j),i);
-                            Data.setNode(new HoverAndClicked(Integer.toString(j), i));
+                            Data.setNode(new HoverAndClicked(parent, Integer.toString(j), i, finalLat, finalLon));
                             series.getData().add(Data);
                             series.setName("Latitude : " + finalLat + " , longitude : " + finalLon);
                         }
@@ -412,28 +412,6 @@ public class Controller {
                     }
 
                     graphic.getData().add(series);
-
-                    series.getNode().setOnMouseEntered(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            series.getNode().setScaleY(1.1);
-                        }
-                    });
-
-                    series.getNode().setOnMouseExited(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            series.getNode().setScaleY(1);
-                        }
-                    });
-
-                    series.getNode().setOnMouseClicked(new EventHandler<MouseEvent>() {
-                        @Override
-                        public void handle(MouseEvent event) {
-                            // Add point to the globe
-                            addLocation(parent, finalLat, finalLon);
-                        }
-                    });
 
                 });
 
@@ -605,7 +583,7 @@ public class Controller {
     // Internal class
     public class HoverAndClicked extends StackPane {
 
-        public HoverAndClicked(String string, Object object){
+        public HoverAndClicked(Group parent, String string, Object object, float lat, float lon){
 
             final Label label = new Label(object + "");
 
@@ -633,6 +611,7 @@ public class Controller {
                 @Override
                 public void handle(MouseEvent event) {
                     mySlider.setValue(Integer.parseInt(string));
+                    addLocation(parent, lat, lon);
                 }
             });
         }
