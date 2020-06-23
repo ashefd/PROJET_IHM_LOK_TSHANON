@@ -371,6 +371,9 @@ public class Controller {
                 animation.stop();
                 // Making sure that the value is correct
                 if (speedLecture.getText().matches("^[-+]?[0-9]*[.]?[0-9]*([eE]?[-+]*[0-9]*)?$") && event.getCode().equals(KeyCode.ENTER)){
+                    if(speedLecture.getText().endsWith("e")){  // If the speed value ends with "e", then add 1 at the end of the value
+                        speedLecture.setText(speedLecture.getText()+"1");
+                    }
                     // If it is the end of the animation but we want to watch it again
                     if(mySlider.getValue() == 2020){
                         mySlider.setValue(1880);
