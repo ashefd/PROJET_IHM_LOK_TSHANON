@@ -22,7 +22,7 @@ public class SimpleTest {
     @Before
     public void setUp() throws Exception {
         try {
-            resourceManager = new Data_Model("resources/tempanomaly_4x4grid.csv");
+            resourceManager = new Data_Model("src/resources/tempanomaly_4x4grid.csv");
             assertNotEquals(resourceManager, null);
         }
         catch (Exception e) {
