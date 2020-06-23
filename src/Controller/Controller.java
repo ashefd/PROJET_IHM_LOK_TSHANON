@@ -87,6 +87,7 @@ public class Controller {
 
     @FXML
     public void initialize(){
+
         //Getting the data
         data = new Data_Model("src/resources/tempanomaly_4x4grid.csv");
 
@@ -250,7 +251,7 @@ public class Controller {
         myPane.getChildren().addAll(sub);
 
 
-        // adding Listener
+        // adding Listener which change the data according the the slider's value
         mySlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -269,6 +270,7 @@ public class Controller {
             }
         });
 
+        // Adding a Listener to the radio button Histogram so as to do the representation with Cylinder
         radioHistogram.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -294,6 +296,7 @@ public class Controller {
             }
         });
 
+        // Adding a Listener to the radio button Quadrilateral so as to do the representation with quadrilateral
         radioQuadrilater.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -319,6 +322,7 @@ public class Controller {
             }
         });
 
+        // Adding a Listener to the myGraph button so as to clear the graphic
         myGraph.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -326,6 +330,7 @@ public class Controller {
             }
         });
 
+        // Creating an Animation Timer so as to do the animation
         AnimationTimer animation = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -334,6 +339,8 @@ public class Controller {
             }
         };
 
+
+        // Adding a Listener for the animation's buttons
         ButtonPlay.setOnAction(e -> {
             if(mySlider.getValue()==2020){
                 // If this is the end of the animation but we want to watch it again
@@ -356,6 +363,8 @@ public class Controller {
             mySlider.setValue(1880);
         });
 
+
+        // Adding a listener to the speedLecture TextField.
         speedLecture.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -372,11 +381,16 @@ public class Controller {
             }
         });
 
+
+
+
+
     }
 
 
 
 
+    // Creating every Quadrilateral on earth but set transparent
     private void initQuadri(Group parent, PhongMaterial transparent){
         Point3D topLeft;
         Point3D topRight;
@@ -397,6 +411,8 @@ public class Controller {
                 float finalLat = lat;
                 float finalLon = lon;
 
+                // Adding an EventHandler which give the latitude and the longitude of the zone
+                // + Adding to the data of the zone to the graphic
                 meshView.setOnMouseClicked(e -> {
                     LatitudeLabel.setText("Latitude : " + finalLat);
                     LongitudeLabel.setText("Longitude : " + finalLon);
@@ -404,6 +420,7 @@ public class Controller {
                     XYChart.Series series = new XYChart.Series();
                     int j = 1880;
 
+                    // Getting the data of the zone to the graphic
                     for(Float i : data.getEveryAnomaly(finalLat, finalLon)){
                         if(!i.equals(Float.NaN)){
                             XYChart.Data<String, Float> Data = new XYChart.Data(Integer.toString(j),i);
@@ -423,6 +440,7 @@ public class Controller {
         }
     }
 
+    // Creating every Cylinder on earth but set transparent
     private void initHisto(Group parent, PhongMaterial transparent){
 
         for(float lat=-88; lat<=88; lat=lat+8){
@@ -440,27 +458,32 @@ public class Controller {
         }
     }
 
+    // Drawing every Cylinder according to the temperature
     private void drawHisto(PhongMaterial Blue, PhongMaterial Red){
         Float x;
+
         for(Location_Model i : histoMap.keySet()){
             x = data.getValue(i.getLatitude(), i.getLongitude(), Integer.toString((int)mySlider.getValue()));
-
             if(x>=0){
+                // Making every positive anomaly value blue
                 histoMap.get(i).setMaterial(Red);
                 histoMap.get(i).setHeight(Math.round(x*100)/100f);
             }else if(x<0){
+                // Making every negative anomaly value red
                 histoMap.get(i).setMaterial(Blue);
                 histoMap.get(i).setHeight(Math.round(-x*100)/100f);
             }
         }
     }
 
+    // Making the Cylinder transparent
     private void setTransparentCylinder(PhongMaterial transparent){
         for(Location_Model i : histoMap.keySet()){
             histoMap.get(i).setMaterial(transparent);
         }
     }
 
+    // Drawing every quadrilateral according to the temperature
     private void drawQuadri(PhongMaterial Color1, PhongMaterial Color2, PhongMaterial Color3, PhongMaterial Color4, PhongMaterial Color5, PhongMaterial Color6, PhongMaterial Color7, PhongMaterial Color8, PhongMaterial Color9){
 
         Float value;
@@ -549,6 +572,7 @@ public class Controller {
         return line;
     }
 
+    // Making the MeshView transparent
     private void setTransparentMeshView(PhongMaterial transparent){
         for(Location_Model i : laMap.keySet()){
             laMap.get(i).setMaterial(transparent);
@@ -566,6 +590,8 @@ public class Controller {
 
     public void addLocation(Group parent, float latitude, float longitude){
         Sphere sphere = new Sphere(0.1);
+
+        // Setting the Id of the sphere to make sure that the sphere is unique
         sphere.setId(Float.toString(latitude)+"-"+Float.toString(longitude));
 
         Point3D location = geoCoordTo3dCoord(latitude,longitude, 1);
@@ -573,7 +599,10 @@ public class Controller {
         sphere.setTranslateY(location.getY());
         sphere.setTranslateZ(location.getZ());
 
+        // Drawing the sphere on earth
         parent.getChildren().add(sphere);
+
+        // Adding an EventHandler. The sphere disapear whenever it is clicked on
         sphere.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {

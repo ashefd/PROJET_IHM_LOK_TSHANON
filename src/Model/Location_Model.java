@@ -25,7 +25,6 @@ public class Location_Model implements Comparable<Location_Model> {
 
     @Override
     public boolean equals(Object obj) {
-        //System.out.println("The equals method is being used");
         if(this == obj) return true;
         if(obj == null) return false;
         if(getClass() != obj.getClass()) return false;

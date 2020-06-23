@@ -19,6 +19,7 @@ public class Data_Model {
         this.readTemperatureFile(path);
     }
 
+    // Methode to read the Temperature File CSV
     public void readTemperatureFile(String path){
         period = new ArrayList<>();
         knownZone = new ArrayList<>();
@@ -74,6 +75,7 @@ public class Data_Model {
         }
     }
 
+    // Adding the value of an anomaly to a particular year and zone
     public boolean addAnomaly(float latitude, float longitude, String year, float anomalyValue){
         if(min > anomalyValue){
             min = anomalyValue;
@@ -84,6 +86,8 @@ public class Data_Model {
         Location_Model inter = new Location_Model(latitude, longitude);
 
         boolean inside = false;
+
+        // Adding a position to the knownZone ArrayList if it is not already inside
         for(Location_Model i : knownZone){
             if(i.equals(inter)){
                 inside = true;
@@ -93,6 +97,7 @@ public class Data_Model {
             knownZone.add(inter);
         }
 
+        // Adding the value of the anomaly to the DataByYear Model
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
                 return i.addData(inter, anomalyValue);
@@ -101,14 +106,10 @@ public class Data_Model {
         return false;
     }
 
+    // Return the value of a position in a particular year
     public java.lang.Float getValue(float latitude, float longitude, String year){
         for(DataByYear_Model i : period){
-            if(i.getYear().equals(year)){
-                /*
-                System.out.println("Dans la methode getValue de Data_model");
-                System.out.println("On cherche la valeur pour " + i.getYear());
-                System.out.println();
-                */
+            if(i.getYear().equals(year)){  // if that is the year that we want
                 return i.getValue(new Location_Model(latitude, longitude));
             }
         }
@@ -123,14 +124,17 @@ public class Data_Model {
         return max;
     }
 
+    // Return the position that is known in the CSV file
     public ArrayList<Location_Model> getKnowZone(){
         return knownZone;
     }
 
+    // Return the number of year that is considered for this project
     public int getNumberYearKnown(){
         return period.size();
     }
 
+    // Return an arraylist which represents the anomalies of a position from 1880 to 2020
     public ArrayList<java.lang.Float> getEveryAnomaly(float latitude, float longitude){
         ArrayList<java.lang.Float> result = new ArrayList<>();
         Location_Model inter = new Location_Model(latitude,longitude);
@@ -140,6 +144,7 @@ public class Data_Model {
         return result;
     }
 
+    // Return an arraylist which represents the anomalies of the globe of a particular year
     public ArrayList<Pair<Location_Model, Float>> getAnomalyPerYear(String year){
         for(DataByYear_Model i : period){
             if(i.getYear().equals(year)){
